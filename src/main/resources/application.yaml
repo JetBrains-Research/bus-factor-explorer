@@ -1,0 +1,6 @@
+ktor:
+  deployment:
+    port: "$PORT:8080"
+  application:
+    modules:
+      - org.jetbrains.research.ictl.riskypatterns.ApplicationKt.module
