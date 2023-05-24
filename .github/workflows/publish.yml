@@ -12,6 +12,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
+          distribution: temurin
           java-version: 17
       - name: Build JIB container and publish to GitHub Packages
         run: ./gradlew jib -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ github.token }}
