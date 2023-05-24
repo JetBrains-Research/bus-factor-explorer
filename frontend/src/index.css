@@ -1,0 +1,106 @@
+body {
+  font-family: 'JetBrains Mono', monospace, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: var(--ring-font-size);
+  margin: 0;
+  overflow-y: scroll;
+}
+
+.App {
+  padding: calc(2 * var(--ring-unit));
+  display: flex;
+  flex-direction: column;
+  background-color: var(--ring-content-background-color);
+  color: var(--ring-text-color);
+}
+
+@media screen and (max-width: 1024px) {
+  .plotly_editor {
+    flex-direction: column;
+  }
+
+  .editor_controls {
+    width: 100% !important;
+  }
+}
+
+.fold__top {
+  height: 34px !important;
+}
+
+.component {
+  margin: var(--ring-unit);
+}
+
+.popup {
+  padding: var(--ring-unit);
+}
+
+.panel-left {
+  box-shadow: 5px 5px 5px lightgray;
+  background: #efefef;
+  border: 2px solid gray;
+  border-radius: 0.5em;
+}
+
+.panel-right {
+  box-shadow: -5px 5px 5px lightgray;
+  background: #efefef;
+  border: 2px solid gray;
+  border-radius: 0.5em;
+}
+
+.header {
+  text-align: center;
+}
+
+.footer {
+  margin: auto;
+  width: 70%;
+  font-size: var(--ring-font-size-smaller);
+  line-height: var(--ring-line-height-lowest);
+}
+
+a[aria-expanded=true] .bi-plus-circle-fill {
+  display: none
+}
+
+a[aria-expanded=true] .bi-dash-circle-fill {
+  display:inline
+}
+
+a[aria-expanded=false] .bi-dash-circle-fill {
+  display: none
+}
+
+a[aria-expanded=false] .bi-plus-circle-fill {
+  display: inline
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #cdcdcd;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #7d7d7d;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #fe2857;
+}
+
+td {
+  white-space: normal !important; 
+  word-wrap: break-word;
+  font-size: small;  
+}
