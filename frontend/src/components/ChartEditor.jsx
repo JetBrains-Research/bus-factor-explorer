@@ -4,7 +4,7 @@ import PlotlyEditor from "react-chart-editor";
 import "react-chart-editor/lib/react-chart-editor.css";
 import {useParams} from "react-router-dom";
 import Papa from "papaparse";
-import {loadChart, saveChart} from "../Util";
+import {loadChart, saveChart} from "../util";
 import frownIcon from '@jetbrains/icons/frown';
 import {LoaderWithProgress} from "./LoaderWithProgress";
 import ErrorMessage from "@jetbrains/ring-ui/dist/error-message/error-message";

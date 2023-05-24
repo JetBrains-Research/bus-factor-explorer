@@ -7,7 +7,7 @@ import experimentIcon from '@jetbrains/icons/experiment-20px';
 import hourglassIcon from '@jetbrains/icons/hourglass';
 import Alert from "@jetbrains/ring-ui/dist/alert/alert";
 import {useNavigate} from "react-router-dom";
-import {scheduleTask} from "../Util";
+import {scheduleTask} from "../util";
 import Markdown from "@jetbrains/ring-ui/dist/markdown/markdown";
 
 export const RUNNING = "RUNNING"

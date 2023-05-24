@@ -3,7 +3,7 @@ import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {LoaderWithProgress} from "./LoaderWithProgress";
 import {useDispatch} from "react-redux";
-import {requestBusFactorGraph} from "../Util";
+import {requestBusFactorGraph} from "../util";
 import {setNewTree} from "../visualization/reducers/treemapSlice";
 
 function VisualizationView() {

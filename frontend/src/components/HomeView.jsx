@@ -2,7 +2,7 @@ import React from "react";
 import {TimeoutInput} from "./TimeoutInput";
 import searchIcon from '@jetbrains/icons/search';
 import ProjectView, {NEED_LOAD, READY, RUNNING} from "./ProjectView";
-import {homeViewStyle, requestProjects, requestReadyProjects, requestStatusOfTasks} from "../Util";
+import {homeViewStyle, requestProjects, requestReadyProjects, requestStatusOfTasks} from "../util";
 import Alert, {Container} from "@jetbrains/ring-ui/dist/alert/alert";
 
 import ErrorMessage from "@jetbrains/ring-ui/dist/error-message/error-message";

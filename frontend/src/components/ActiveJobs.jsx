@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {Tab, Tabs} from "@jetbrains/ring-ui/dist/tabs/tabs";
 import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
-import {requestActive, requestLog} from "../Util";
+import {requestActive, requestLog} from "../util";
 import Markdown from "@jetbrains/ring-ui/dist/markdown/markdown";
 import task from '@jetbrains/icons/task';
 import ProgressBar from "@jetbrains/ring-ui/dist/progress-bar/progress-bar";
