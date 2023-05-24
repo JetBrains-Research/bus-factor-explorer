@@ -1,11 +1,12 @@
 name: Publish Docker image
 on:
-  push:
-    branches:
-      - master
-      - main
+  workflow_run:
+    workflows: ["Java CI with Gradle"]
+    branches: [main]
+    types:
+      - completed
 jobs:
-  build:
+  publish-image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
