@@ -193,7 +193,7 @@ class CommitProcessor(
         if (authors.isEmpty()) {
             return false
         }
-        val userIds = authors.mapTo(mutableSetOf()) { context.userMapper.add(it) }
+        val userIds = authors.map { context.userMapper.add(it) }.toSet()
 
         val authorCommitTimestamp = commit.authorIdent.`when`.time
         val diffs = getDiffsWithoutText(commit, reader, repository)
