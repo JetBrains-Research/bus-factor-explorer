@@ -1,5 +1,6 @@
 package org.jetbrains.research.ictl.riskypatterns.calculation
 
+import org.eclipse.jgit.errors.MissingObjectException
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.Constants.OBJ_BLOB
@@ -11,14 +12,18 @@ import org.eclipse.jgit.treewalk.TreeWalk
 import org.jetbrains.research.ictl.riskypatterns.calculation.entities.Tree
 import org.jetbrains.research.ictl.riskypatterns.calculation.entities.UserVis
 import org.jetbrains.research.ictl.riskypatterns.calculation.processors.CommitProcessor
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.Duration
 import java.util.*
 import kotlin.collections.ArrayDeque
 
-open class BusFactor(repositoryFile: File) {
+open class BusFactor(repositoryFile: File, private val botsLogins: Set<String> = emptySet()) {
 
     companion object {
+        val log: Logger = LoggerFactory.getLogger(BusFactor::class.java)
+
         fun getExtension(fileName: String): CharSequence? {
             val index: Int = fileName.indexOfLast { it == '.' }
             return if (index < 0) {
@@ -43,7 +48,7 @@ open class BusFactor(repositoryFile: File) {
     protected val reader: ObjectReader = repository.newObjectReader()
 
     open fun calculate(repositoryName: String): Tree {
-        val context = BusFactorComputationContext()
+        val context = BusFactorComputationContext(botsLogins = botsLogins)
         val commitProcessor = CommitProcessor(context, reader, repository)
 
         val lastCommit = proceedCommits(commitProcessor)
@@ -131,12 +136,15 @@ open class BusFactor(repositoryFile: File) {
         while (treeWalk.next()) {
             val filePath = treeWalk.pathString
 
-            val bytes = reader.getObjectSize(treeWalk.getObjectId(0), OBJ_BLOB)
-            if (treeWalk.isSubtree) {
-                // directory
-//      proceedFilePath(filePath, false)
-                treeWalk.enterSubtree()
-                continue
+            var bytes = 0L
+            try {
+                bytes = reader.getObjectSize(treeWalk.getObjectId(0), OBJ_BLOB)
+                if (treeWalk.isSubtree) {
+                    treeWalk.enterSubtree()
+                    continue
+                }
+            } catch (e: MissingObjectException) {
+                log.warn("Missing blob : $filePath : ${e.message} ")
             }
             proceedFilePath(filePath, bytes)
         }
