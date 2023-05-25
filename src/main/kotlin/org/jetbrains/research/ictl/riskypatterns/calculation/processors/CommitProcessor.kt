@@ -189,11 +189,12 @@ class CommitProcessor(
             return false
         }
 
-        val authors = getAuthors(commit)
-        val userIds = authors.mapTo(mutableSetOf()) { context.userMapper.add(it) }
-        if (authors.none { !context.userMapper.isBot(it) }) {
+        val authors = getAuthors(commit).filter { !context.userMapper.isBot(it) }
+        if (authors.isEmpty()) {
             return false
         }
+        val userIds = authors.mapTo(mutableSetOf()) { context.userMapper.add(it) }
+
         val authorCommitTimestamp = commit.authorIdent.`when`.time
         val diffs = getDiffsWithoutText(commit, reader, repository)
 
