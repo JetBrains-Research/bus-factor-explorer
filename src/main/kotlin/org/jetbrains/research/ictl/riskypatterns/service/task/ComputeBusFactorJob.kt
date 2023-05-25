@@ -62,8 +62,9 @@ class ComputeBusFactorJob(
             log.info(repositoryCloned)
             executionEnvironment.logFile.log(repositoryCloned)
 
+            val bots = gitHubClient.loadBots(payload.owner, payload.repo)
             val started = System.currentTimeMillis()
-            val busFactor = BusFactor(File(executionEnvironment.gitDir, ".git"))
+            val busFactor = BusFactor(File(executionEnvironment.gitDir, ".git"), bots)
             val tree = busFactor.calculate(payload.fullName)
             val ended = System.currentTimeMillis()
 

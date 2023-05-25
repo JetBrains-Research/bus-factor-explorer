@@ -1,21 +1,19 @@
 package org.jetbrains.research.ictl.riskypatterns.service.github
 
 import com.google.gson.annotations.SerializedName
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.resources.*
 import io.ktor.client.plugins.resources.Resources
-import io.ktor.client.plugins.resources.get
-import io.ktor.client.request.headers
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
-import io.ktor.resources.Resource
-import io.ktor.serialization.gson.gson
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.resources.*
+import io.ktor.serialization.gson.*
 import org.jetbrains.research.ictl.riskypatterns.domain.GitHubRepository
 import org.jetbrains.research.ictl.riskypatterns.domain.RepositoryOwner
 
@@ -51,6 +49,10 @@ val basicClient: HttpClient by lazy {
 class GitHubClient(
     private val httpClient: HttpClient = basicClient,
 ) {
+    companion object {
+        const val BOT_TYPE = "Bot"
+    }
+
     suspend fun getRepository(fullName: String): GitHubRepository {
         val (owner, repo) = fullName.split("/")
         val item = httpClient.get(GetGitHubRepository.Owner(GetGitHubRepository(), owner, repo))
@@ -100,6 +102,12 @@ class GitHubClient(
         }
         return result
     }
+
+    suspend fun loadBots(owner: String, repo: String): Set<String> =
+        httpClient.get(GetGitHubRepository.Contributors(GetGitHubRepository(), owner, repo))
+            .body<List<ContributorItem>>()
+            .filter { it.type == BOT_TYPE }
+            .mapTo(mutableSetOf()) { it.login }
 }
 
 /**
@@ -123,7 +131,16 @@ class GitHubRepositories(val q: String, val page: Int = 1, val per_page: Int = 3
 class GetGitHubRepository() {
     @Resource("/{owner}/{repo}")
     class Owner(val parent: GetGitHubRepository = GetGitHubRepository(), val owner: String, val repo: String)
+
+    @Resource("/{owner}/{repo}/contributors")
+    class Contributors(val parent: GetGitHubRepository = GetGitHubRepository(), val owner: String, val repo: String)
 }
+
+data class ContributorItem(
+    val login: String,
+    val type: String,
+    val url: String,
+)
 
 data class GitHubSearchRepositoriesResponseItemOwner(
     val login: String,

@@ -21,6 +21,7 @@ class CommitProcessor(
 
     companion object {
         private const val reviewStartToken = "Reviewed-by: "
+        private const val coAuthorStartToken = "Co-authored-by: "
         private const val reviewersSplit = ", "
 
         fun getFilePath(diffEntry: DiffEntry): String {
@@ -78,14 +79,32 @@ class CommitProcessor(
         return reviewersLine.split(reviewersSplit)
     }
 
+    private fun getAuthors(commit: RevCommit): Set<String> {
+        val result = mutableSetOf<String>()
+        val msg = commit.fullMessage
+        for (line in msg.split("\n")) {
+            if (line.startsWith(coAuthorStartToken)) {
+                val openIdx = line.indexOf("<")
+                val closeIdx = line.indexOf(">")
+                val email = line.substring(openIdx + 1, closeIdx)
+                result.add(email)
+            }
+        }
+        val author = commit.authorIdent.emailAddress
+        result.add(author)
+        return result
+    }
+
     /**
      * This function corresponds to addition of a new file: we want to add this file to FileMapper,
      * track it in CommitMapper (for code reviews) and save its author in filesOwnershipPrototypes
      */
-    private fun addDiff(diffEntry: DiffEntry, authorCommitTimestamp: Long, userId: Int) {
+    private fun addDiff(diffEntry: DiffEntry, authorCommitTimestamp: Long, userIds: Set<Int>) {
         val filePath = getFilePath(diffEntry)
         val fileId = context.fileMapper.add(filePath)
-        addDiff(fileId, userId, authorCommitTimestamp)
+        userIds.forEach {
+            addDiff(fileId, it, authorCommitTimestamp)
+        }
     }
 
     private fun addDiff(fileId: Int, userId: Int, commitTimestamp: Long) {
@@ -106,16 +125,18 @@ class CommitProcessor(
      * This function is for tracking file modification: we want to get the file ID,
      * track the file for code reviews in the CommitMapper, and save data about change in filesOwnershipPrototypes
      */
-    private fun modifyDiff(diffEntry: DiffEntry, authorCommitTimestamp: Long, userId: Int) {
+    private fun modifyDiff(diffEntry: DiffEntry, authorCommitTimestamp: Long, userIds: Set<Int>) {
         val filePath = getFilePath(diffEntry)
         val fileId = context.fileMapper.getOrNull(filePath)
 
         if (fileId == null) {
-            addDiff(diffEntry, authorCommitTimestamp, userId)
+            addDiff(diffEntry, authorCommitTimestamp, userIds)
         } else {
-            context.filesOwnership.computeIfAbsent(fileId) { ConcurrentHashMap() }
-                .computeIfAbsent(userId) { ContributionsByUser() }
-                .addFileChange(authorCommitTimestamp, context.lastCommitCommitterTimestamp)
+            userIds.forEach {
+                context.filesOwnership.computeIfAbsent(fileId) { ConcurrentHashMap() }
+                    .computeIfAbsent(it) { ContributionsByUser() }
+                    .addFileChange(authorCommitTimestamp, context.lastCommitCommitterTimestamp)
+            }
         }
     }
 
@@ -168,8 +189,12 @@ class CommitProcessor(
             return false
         }
 
-        val userId = context.userMapper.add(commit)
-        // TODO: timestamp date
+        val authors = getAuthors(commit).filter { !context.userMapper.isBot(it) }
+        if (authors.isEmpty()) {
+            return false
+        }
+        val userIds = authors.map { context.userMapper.add(it) }.toSet()
+
         val authorCommitTimestamp = commit.authorIdent.`when`.time
         val diffs = getDiffsWithoutText(commit, reader, repository)
 
@@ -183,7 +208,7 @@ class CommitProcessor(
                 }
 
                 else -> {
-                    addDiff(diffEntry, authorCommitTimestamp, userId)
+                    addDiff(diffEntry, authorCommitTimestamp, userIds)
                 }
             }
             if (context.configSnapshot.useReviewers) {

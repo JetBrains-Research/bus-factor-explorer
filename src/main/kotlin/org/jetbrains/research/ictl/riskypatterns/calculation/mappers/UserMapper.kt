@@ -7,7 +7,7 @@ import org.eclipse.jgit.revwalk.RevCommit
  * Stores user ids (emails if no user id is available)
  */
 @Serializable
-class UserMapper : Mapper() {
+class UserMapper(private val botsLogins: Set<String> = emptySet()) : Mapper() {
 
     private val nameToUserId = HashMap<String, Int>()
 
@@ -33,4 +33,6 @@ class UserMapper : Mapper() {
             nameToUserId[name] = id
             id
         }
+
+    fun isBot(email: String) = botsLogins.any { email.contains(it) }
 }
