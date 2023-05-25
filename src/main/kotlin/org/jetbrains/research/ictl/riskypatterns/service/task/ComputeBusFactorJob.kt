@@ -1,7 +1,6 @@
 package org.jetbrains.research.ictl.riskypatterns.service.task
 
 import org.jetbrains.research.ictl.riskypatterns.calculation.BusFactor
-import org.jetbrains.research.ictl.riskypatterns.github.Client
 import org.jetbrains.research.ictl.riskypatterns.service.artifact.ArtifactService
 import org.jetbrains.research.ictl.riskypatterns.service.github.GitHubClient
 import org.jetbrains.research.ictl.riskypatterns.service.task.listener.EventLevel
@@ -64,7 +63,7 @@ class ComputeBusFactorJob(
             executionEnvironment.logFile.log(repositoryCloned)
 
             val started = System.currentTimeMillis()
-            val bots = Client().loadBots(payload.owner, payload.repo)
+            val bots = gitHubClient.loadBots(payload.owner, payload.repo)
             val busFactor = BusFactor(File(executionEnvironment.gitDir, ".git"), bots)
             val tree = busFactor.calculate(payload.fullName)
             val ended = System.currentTimeMillis()
