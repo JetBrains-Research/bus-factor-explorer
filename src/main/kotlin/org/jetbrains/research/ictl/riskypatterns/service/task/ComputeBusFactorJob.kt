@@ -64,8 +64,7 @@ class ComputeBusFactorJob(
             executionEnvironment.logFile.log(repositoryCloned)
 
             val started = System.currentTimeMillis()
-            val (ownerGithub, repoGithub) = payload.cloneUrl.removePrefix("https://github.com/").split("/")
-            val bots = Client().loadBots(ownerGithub, repoGithub)
+            val bots = Client().loadBots(payload.owner, payload.repo)
             val busFactor = BusFactor(File(executionEnvironment.gitDir, ".git"), bots)
             val tree = busFactor.calculate(payload.fullName)
             val ended = System.currentTimeMillis()
