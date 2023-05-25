@@ -108,7 +108,6 @@ class GitHubClient(
             .body<List<ContributorItem>>()
             .filter { it.type == BOT_TYPE }
             .mapTo(mutableSetOf()) { it.login }
-
 }
 
 /**
@@ -136,7 +135,6 @@ class GetGitHubRepository() {
     @Resource("/{owner}/{repo}/contributors")
     class Contributors(val parent: GetGitHubRepository = GetGitHubRepository(), val owner: String, val repo: String)
 }
-
 
 data class ContributorItem(
     val login: String,
