@@ -152,43 +152,25 @@ function StatsPane(props) {
 
           <h6>Author Contribution</h6>
           {authorsList && topAuthors ? (
-            <></>
+            <List
+              maxHeight={400}
+              compact={true}
+              shortcuts={true}
+              data={topAuthors.map((authorScorePair, index) => {
+                  return {
+                    label: authorScorePair["email"],
+                    rgItemType: List.ListProps.Type.ITEM,
+                    details: formatPercentage(authorScorePair["relativeScore"])
+                  }
+                }
+              )}
+            />
           ) : (
-            // <>
-            //   <label
-            //     htmlFor="authorNumberSelecter"
-            //     className="form-label small">
-            //     Showing top {numOfAuthors}
-            //     {" of "}
-            //     {totalNumOfAuthors}
-            //   </label>
-            //   <input
-            //     type="range"
-            //     className="form-range"
-            //     value={numOfAuthors}
-            //     onChange={(e) => setNumOfAuthors(e.target.value)}
-            //     min={0}
-            //     max={totalNumOfAuthors}
-            //     id="authorNumberSelecter"></input>
-            // </>
             <>
               <p>No author info available</p>
             </>
           )}
 
-          <List
-            maxHeight={400}
-            compact={true}
-            shortcuts={true}
-            data={authorsList && topAuthors ? topAuthors.map((authorScorePair, index) => {
-                return {
-                  label: authorScorePair["email"],
-                  rgItemType: List.ListProps.Type.ITEM,
-                  details: formatPercentage(authorScorePair["relativeScore"])
-                }
-              }
-            ) : {}}
-          />
         </div>
       </Content>
     </Island>
