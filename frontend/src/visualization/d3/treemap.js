@@ -7,6 +7,7 @@ import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
 import { CONFIG } from "../config";
 import uid from "./uid.tsx";
 import { filter } from "d3";
+import {nodeWithChildren} from "../reducers/treemapSlice";
 import { getFileExtension } from "../utils/url.tsx";
 
 /*
@@ -28,7 +29,7 @@ export const formatSI = d3.format(".2s");
 export const treemap = d3.treemap;
 
 export function normalizeD3DataValues(node) {
-  if (node.children) {
+  if (nodeWithChildren(node)) {
     node.children.forEach((element) => {
       normalizeD3DataValues(element);
     });
@@ -179,7 +180,7 @@ function rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions) {
 }
 
 function rectangleOnClickHandlerMainTreemap(d, setPathFunction) {
-  if ("children" in d.data && d.data.children) {
+  if (nodeWithChildren(d.data)) {
     setPathFunction(d.data.path);
   } else {
     setPathFunction("", d.data.path);
@@ -296,7 +297,7 @@ node status: ${
     .append("div");
 
   textBox
-    .filter((d) => d.data.children && d.depth > 0)
+    .filter((d) => nodeWithChildren(d.data) && d.depth > 0)
     .on("click", (_e, d) =>
       rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions)
     )
@@ -416,7 +417,7 @@ bus factor: ${
     .append("div");
 
   textBox
-    .filter((d) => d.data.children && d.depth > 0)
+    .filter((d) => nodeWithChildren(d.data) && d.depth > 0)
     .append("xhtml:i")
     .attr("class", CONFIG.treemap.classes.folderIcon)
     .style("color", (d) => d.textColor)

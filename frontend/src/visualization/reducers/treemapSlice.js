@@ -86,7 +86,7 @@ function getDataRecalculated(fullData, pathQuery, developersToRemove) {
 export function initializeBusFactorDeltaProperties(node) {
   if (node == null) throw new Error("Empty data file");
 
-  if (node.children) {
+  if (nodeWithChildren(node)) {
     return {
       ...node,
       children: node.children.map((it) => {
@@ -130,7 +130,7 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
   newDataRootNodeCopy.busFactorStatus = {
     ...newDataRootNodeCopy.busFactorStatus,
   };
-  if (newDataRootNodeCopy.children)
+  if (nodeWithChildren(newDataRootNodeCopy))
     newDataRootNodeCopy.children = [...newDataRootNodeCopy.children];
 
   if (oldDataRootNode === null) {
@@ -162,8 +162,8 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
     }
 
     if (
-      oldDataRootNode.children &&
-      newDataRootNodeCopy.children &&
+      nodeWithChildren(oldDataRootNode) &&
+      nodeWithChildren(newDataRootNodeCopy) &&
       newDataRootNodeCopy.children.length === oldDataRootNode.children.length
     ) {
       for (
@@ -275,7 +275,7 @@ const treemapSlice = createSlice({
         let newData = goThroughTree(state.tree, nextPath);
         console.log("scopeTreemapIn", newData, nextPath);
 
-        if (newData && newData.children) {
+        if (newData && nodeWithChildren(newData)) {
           const prevStack = Array.from(state.mainTreemap.previousPathStack);
           prevStack.push(state.mainTreemap.currentVisualizationPath);
           return {
@@ -504,6 +504,10 @@ const treemapSlice = createSlice({
     },
   },
 });
+
+export function nodeWithChildren(node) {
+  return node.children && node.children.length > 0
+}
 
 // Exports
 export const {
