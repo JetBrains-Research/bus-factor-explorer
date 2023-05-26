@@ -84,9 +84,7 @@ class CommitProcessor(
         val msg = commit.fullMessage
         for (line in msg.split("\n")) {
             if (line.startsWith(coAuthorStartToken)) {
-                val openIdx = line.indexOf("<")
-                val closeIdx = line.indexOf(">")
-                val email = line.substring(openIdx + 1, closeIdx)
+                val email = line.trim().split(" ").last().removePrefix("<").removeSuffix(">")
                 result.add(email)
             }
         }
