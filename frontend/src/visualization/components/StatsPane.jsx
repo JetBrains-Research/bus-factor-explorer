@@ -108,13 +108,8 @@ function StatsPane(props) {
     if (isFirstRender.current) {
       isFirstRender.current = false;
     }
-    // if (nodeBusFactor && nodeBusFactor > 0) {
-    //   setNumOfAuthors(nodeBusFactor);
-    // } else
+
     if (totalNumOfAuthors) {
-      // totalNumOfAuthors > 10
-      //   ? setNumOfAuthors(10)
-      // :
       setNumOfAuthors(totalNumOfAuthors);
     }
   }, [nodeBusFactor, totalNumOfAuthors]);
@@ -137,6 +132,7 @@ function StatsPane(props) {
           <i className="bi bi-plus-circle-fill"></i>
           <i className="bi bi-dash-circle-fill"></i>
         </a>
+
       </Header>
       <Content>
 
@@ -154,7 +150,7 @@ function StatsPane(props) {
             </li>
           </ul>
 
-          <h5>Author Contribution</h5>
+          <h6>Author Contribution</h6>
           {authorsList && topAuthors ? (
             <></>
           ) : (
@@ -193,7 +189,6 @@ function StatsPane(props) {
               }
             ) : {}}
           />
-
         </div>
       </Content>
     </Island>

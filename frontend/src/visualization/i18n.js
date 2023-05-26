@@ -20,9 +20,9 @@ const resources = {
         details: ["All of the folder names in the path are clickable. Clicking on any of them will route the visualization to the contents of that specific folder."]
       },
       filters: {
-        general: ["Filters to file names can be applied in 2 ways: Manually adding regular expressions or choosing predefined templates containing multiple regular expressions.", "The results returned are those files/folders that satisfy all the given regular expressions specified for filtering (i.e. intersection of the results of each regular expression applied individually)"],
-        regex: ["We appreciate that translating our ideas into regular expressions are not always the most straightforward of tasks. Here is a link to a website where you can test out your regular expressions before filtering to get better results:"],
-        templates: ["Templates are collections of expressions that are commonly used together to focus on certain types of files e.g. show only all JSX JS and TSX files for a React + TypeScript project", "Having them predefined allows you to apply such filters with one click instead of having to individually test regular expressions and combine them by hand"],
+        general: ["You can filter the files in two different ways. You can either manually add regular expressions or choose predefined templates for multiple regular expressions.", "After filtering, we show those files/folders that satisfy all the given regular expressions you specify for filtering"],
+        regex: ["You can try out the regex you have written at this website to check whether it provides the desired results."],
+        templates: ["Templates are collections of expressions that are commonly used together to focus on certain types of files. For example, you can show just the JSX JS and TSX files for a React + TypeScript project", "Predefined templates allow you to apply filters with one click instead of testing and adding regular expressions one by one"],
         links: ["https://regexr.com"]
       },
       simMode: {

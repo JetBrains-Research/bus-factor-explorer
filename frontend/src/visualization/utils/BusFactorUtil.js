@@ -49,9 +49,9 @@ function getMajorFileData(node, developersToRemove) {
       });
     }
 
-    fileMajorUsers = fileMajorUsers.filter( function( el ) {
-      return !developersToRemove.includes( el );
-    } );
+    fileMajorUsers = fileMajorUsers.filter(function (el) {
+      return !developersToRemove.includes(el);
+    });
 
     if (debug) {
       result.push({

@@ -62,7 +62,7 @@ function FilterWithInput(props) {
   };
 
   return (
-    <div className="mt-3 mb-3">
+    <div className="mb-3">
       <h6>
         {filterPropertyType}{" "}
         {props.infoPanelDetails !== null ? (
@@ -73,7 +73,8 @@ function FilterWithInput(props) {
         ) : null}
       </h6>
 
-      {/*TODO: replace with better looking ringui*/}
+      {props.summary ? <small>{props.summary}</small> : null}
+
       <div className="input-group">
         <input
           type="text"
