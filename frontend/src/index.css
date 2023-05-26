@@ -104,3 +104,58 @@ td {
   word-wrap: break-word;
   font-size: small;  
 }
+
+.horizontal-slider {
+  display: inline-block;
+  color: black;
+  text-align: center;
+  vertical-align: text-top;
+  align-items:start;
+  padding: 1em;
+}
+
+.slider-track {
+  background-color: black;
+  height: 0.25rem;
+  border-radius: 1em 1em 1em 1em;
+  /* border: 1px solid black; */
+}
+
+.slider-thumb {
+  background-color: light;
+  border: 2px solid gray;
+  border-radius: 100%;
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: small;
+  bottom: 0.3em;
+  cursor: grab
+}
+
+.slider-thumb:active {
+  box-shadow: inset 5px 5px 10px 20px gainsboro;
+  cursor: grabbing;
+}
+
+.slider-marks {
+  background-color: black;
+  border: 2px solid gainsboro;
+  border-radius: 100%;
+  height: 0.25rem;
+  width: 0.25rem;
+}
+
+.color-legend-box {
+  border: 2px solid darkslategray;
+  border-radius: 5%;
+}
+
+.color-legend-box:hover {
+  border: 4px solid gray;
+  border-radius: 20%;
+}
+
+.color-legend-box:active {
+  border: 4px solid gray;
+  border-radius: 20%;
+}
