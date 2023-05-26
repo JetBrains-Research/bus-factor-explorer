@@ -120,6 +120,7 @@ function LegendColor(props) {
     setPaletteColor(color.rgb);
   };
 
+  const margin = {marginBottom: 10}
   return (
     <>
       <Island>
@@ -144,10 +145,12 @@ function LegendColor(props) {
           <div
             id="legendColorCollapsible"
             className="collapse show">
-            {props.summary ? <small>{props.summary}</small> : null}
+            <div style={margin}>
+              {props.summary ? <small>{props.summary}</small> : null}
+            </div>
             {scale.reverse().map((element, index) => {
               return (
-                <div key={element.label}>
+                <div key={element.label} style={margin}>
                   <div onClick={(e) => handleClick(index)}>
                     {generateSvgSquare("1.5rem", element.color)}
                     <div><small>{element.label}</small></div>
