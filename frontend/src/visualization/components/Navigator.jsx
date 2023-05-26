@@ -1,15 +1,15 @@
 /** @format */
 
-import React, { useState, useMemo } from "react";
-import { batch, useSelector } from "react-redux";
+import React, {useMemo, useState} from "react";
+import {batch, useSelector} from "react-redux";
 
 import {InfoPanel} from "./InfoPanel";
 import {useTranslation} from "react-i18next";
 
 import {CONFIG} from "../config";
 import {
-  addFilter,
   addExtensionFilter,
+  addFilter,
   removeAllFilters,
   removeExtensionFilter,
   removeFilter,
@@ -19,8 +19,8 @@ import {
 import FilterWithInput from "./FilterWithInput";
 import SimulationModeModal from "./SimulationModeModal";
 import LegendSize from "./LegendSize";
-import { generateBreadcrumb, getFileExtension } from "../utils/url.tsx";
-import { Form } from "react-bootstrap";
+import {generateBreadcrumb, getFileExtension} from "../utils/url.tsx";
+import {Form} from "react-bootstrap";
 import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
 import Button from "@jetbrains/ring-ui/dist/button/button";
 import arrowUpIcon from '@jetbrains/icons/arrow-up';
@@ -248,9 +248,9 @@ export default Navigator;
 
 
 // TODO: refactor must be a better way
-export const addMargin = (elem) => {
+export const addMargin = (elem, marginBottom) => {
   const margin = {
-    marginBottom: 20
+    marginBottom: marginBottom || 20
   }
   return <div style={margin}>
     {elem}

@@ -39,10 +39,10 @@ function OffCanvasSideBar(props) {
             }}
             className="fs-6 fw-normal">
             {props.body.map((text) => {
-              if (text.startsWith("http")) {
+              if (text.startsWith && text.startsWith("http")) {
                 return <a key={text} href={text}>{text + "\n"}</a>;
               } else {
-                return text + "\n";
+                return text;
               }
             })}
           </p>
@@ -59,7 +59,8 @@ export function InfoPanel(props) {
       <OffCanvasSideBar
         divName={props.divName}
         header={props.header}
-        body={props.body}></OffCanvasSideBar>
+        body={props.body}>
+      </OffCanvasSideBar>
     </>
   );
 }
