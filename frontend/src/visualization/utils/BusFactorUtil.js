@@ -1,4 +1,5 @@
 /** @format */
+import {nodeWithChildren} from "../reducers/treemapSlice";
 
 const debug = false
 
@@ -6,7 +7,7 @@ const debug = false
 export function calculateBusFactor(data, developersToRemove) {
   const result = busFactorForFolder(data, developersToRemove);
 
-  if (data.children) {
+  if (nodeWithChildren(data)) {
     const children = [];
     data.children.forEach((child) => {
       const node = busFactorForFolder(child, developersToRemove);
@@ -49,9 +50,9 @@ function getMajorFileData(node, developersToRemove) {
       });
     }
 
-    fileMajorUsers = fileMajorUsers.filter( function( el ) {
-      return !developersToRemove.includes( el );
-    } );
+    fileMajorUsers = fileMajorUsers.filter(function (el) {
+      return !developersToRemove.includes(el);
+    });
 
     if (debug) {
       result.push({

@@ -21,11 +21,11 @@ function OffCanvasSideBar(props) {
         id={props.divName}
         aria-labelledby={props.divName + "Label"}>
         <div className="offcanvas-header">
-          <h5
+          <h6
             className="offcanvas-title"
             id={props.divName + "Label"}>
             {props.header}
-          </h5>
+          </h6>
           <button
             type="button"
             className="btn-close"
@@ -59,8 +59,8 @@ export function InfoPanel(props) {
       <OffCanvasSideBar
         divName={props.divName}
         header={props.header}
-        body={props.body}
-      />
+        body={props.body}>
+      </OffCanvasSideBar>
     </>
   );
 }

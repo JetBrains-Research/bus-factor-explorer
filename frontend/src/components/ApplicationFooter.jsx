@@ -12,7 +12,7 @@ export const ApplicationFooter = () => {
             url: 'https://github.com/JetBrains-Research/bus-factor-explorer',
             label: 'bus-factor-explorer'
           },
-          ' by ICTL'
+          ' by ICTL and BILSEN Group'
         ],
       ]}
       center={[

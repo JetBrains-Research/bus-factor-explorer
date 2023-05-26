@@ -1,30 +1,42 @@
 /** @format */
 
-import {createSlice} from "@reduxjs/toolkit";
-import {calculateBusFactor} from "../utils/BusFactorUtil";
+import { createSlice } from "@reduxjs/toolkit";
+import { calculateBusFactor } from "../utils/BusFactorUtil";
+import { CONFIG } from "../config";
+
+const defaultColors = [
+  CONFIG.general.colors.jetbrains.gray,
+  CONFIG.general.colors.jetbrains.darkRed,
+  CONFIG.general.colors.jetbrains.golden,
+  CONFIG.general.colors.jetbrains.white,
+];
+
+const defaultColorThresholds = [2, 5];
 
 const defaultTree = {
-  "name": "PlaceHolder",
-  "path": ".",
-  "bytes": 1,
-  "busFactorStatus": {
-    "busFactor": 1
+  name: "PlaceHolder",
+  path: ".",
+  bytes: 1,
+  busFactorStatus: {
+    busFactor: 1,
   },
-  "users": [
+  users: [
     {
-      "email": "place.holder@mail.com",
-      "authorship": 0.5
-    },],
-  "children": [
+      email: "place.holder@mail.com",
+      authorship: 0.5,
+    },
+  ],
+  children: [
     {
-      "name": "place_holder",
-      "path": "/place_holder",
-      "bytes": 1,
-      "busFactorStatus": {
-        "old": true
-      }
-    },]
-}
+      name: "place_holder",
+      path: "/place_holder",
+      bytes: 1,
+      busFactorStatus: {
+        old: true,
+      },
+    },
+  ],
+};
 
 function convertTreeToState(tree) {
   return {
@@ -35,6 +47,8 @@ function convertTreeToState(tree) {
       ignored: [],
       isRecalculationEnabled: false,
       previousPathStack: [],
+      thresholds: defaultColorThresholds,
+      colors: defaultColors,
     },
     simulation: {
       isSimulationMode: false,
@@ -46,22 +60,22 @@ function convertTreeToState(tree) {
       },
       removedAuthors: [],
     },
-    filters: [],
+    extensionFilters: [],
+    regexFilters: [],
   };
 }
 
-
 function goThroughTree(tree, path) {
-  if (path === ".") return tree
+  if (path === ".") return tree;
 
-  const parts = path.split('/')
-  let node = tree
+  const parts = path.split("/");
+  let node = tree;
   for (let i = 0; i < parts.length; i++) {
-    const part = parts[i]
-    if (i === 0 && part === "") continue
-    node = node.children.filter((it) => it.name === part)[0]
+    const part = parts[i];
+    if (i === 0 && part === "") continue;
+    node = node.children.filter((it) => it.name === part)[0];
   }
-  return node
+  return node;
 }
 
 function getDataRecalculated(fullData, pathQuery, developersToRemove) {
@@ -72,33 +86,33 @@ function getDataRecalculated(fullData, pathQuery, developersToRemove) {
 export function initializeBusFactorDeltaProperties(node) {
   if (node == null) throw new Error("Empty data file");
 
-  if (node.children) {
+  if (nodeWithChildren(node)) {
     return {
       ...node,
       children: node.children.map((it) => {
-        const result =
-          Object.fromEntries(Object.entries(it).filter(e => e[0] !== 'children'))
+        const result = Object.fromEntries(
+          Object.entries(it).filter((e) => e[0] !== "children")
+        );
         if (!result.busFactorStatus) {
-          result["busFactorStatus"] = {}
-          return result
+          result["busFactorStatus"] = {};
+          return result;
         }
         return {
           ...result,
           busFactorStatus: {
             ...result.busFactorStatus,
             nodeStatus: "original",
-            delta: 0
-          }
-        }
-
-      })
-    }
+            delta: 0,
+          },
+        };
+      }),
+    };
   }
 
   return {
     ...node,
-    ...(!node.busFactorStatus) && {busFactorStatus: {}},
-  }
+    ...(!node.busFactorStatus && { busFactorStatus: {} }),
+  };
 }
 
 export function getRecalculatedBusFactorData(baseData, developersToRemove) {
@@ -112,11 +126,11 @@ function getDataFromCurrentData(currentData, developersToRemove, filters) {
 }
 
 export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
-  let newDataRootNodeCopy = {...newDataRootNode};
+  let newDataRootNodeCopy = { ...newDataRootNode };
   newDataRootNodeCopy.busFactorStatus = {
     ...newDataRootNodeCopy.busFactorStatus,
   };
-  if (newDataRootNodeCopy.children)
+  if (nodeWithChildren(newDataRootNodeCopy))
     newDataRootNodeCopy.children = [...newDataRootNodeCopy.children];
 
   if (oldDataRootNode === null) {
@@ -140,16 +154,16 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
       oldDataRootNode.busFactorStatus.busFactor + delta <= 0
         ? "lost"
         : delta < 0
-          ? "decrease"
-          : "original";
-    
+        ? "decrease"
+        : "original";
+
     if (oldDataRootNode.busFactorStatus.busFactor === 0) {
-      newDataRootNodeCopy.busFactorStatus.nodeStatus = "original"
+      newDataRootNodeCopy.busFactorStatus.nodeStatus = "original";
     }
 
     if (
-      oldDataRootNode.children &&
-      newDataRootNodeCopy.children &&
+      nodeWithChildren(oldDataRootNode) &&
+      nodeWithChildren(newDataRootNodeCopy) &&
       newDataRootNodeCopy.children.length === oldDataRootNode.children.length
     ) {
       for (
@@ -163,7 +177,7 @@ export function getBusFactorDeltas(oldDataRootNode, newDataRootNode) {
         while (
           oldPath !== newDataRootNodeCopy.children[newCount].path &&
           newCount < newDataRootNodeCopy.children.length
-          ) {
+        ) {
           newCount++;
         }
 
@@ -194,19 +208,19 @@ const treemapSlice = createSlice({
   initialState: convertTreeToState(defaultTree),
   reducers: {
     setNewTree: (state, action) => {
-      return {...convertTreeToState(action.payload)}
+      return { ...convertTreeToState(action.payload) };
     },
     // not as useful anymore, URL takes precedence, or at least, it should
     returnMainTreemapHome: (state) => {
-      const path = state.tree.path
+      const path = state.tree.path;
       return {
         ...state,
         mainTreemap: {
           ...state.mainTreemap,
           currentVisualizationPath: path,
-          currentStatsPath: path
-        }
-      }
+          currentStatsPath: path,
+        },
+      };
     },
     returnMiniTreemapHome: (state) => {
       let newData = getDataRecalculated(
@@ -222,10 +236,10 @@ const treemapSlice = createSlice({
           miniTreemap: {
             ...state.simulation.miniTreemap,
             visualizationData: newData,
-            visualizationPath: newData.path
-          }
-        }
-      }
+            visualizationPath: newData.path,
+          },
+        },
+      };
     },
     // click on a file node
     scopeStatsIn: (state, action) => {
@@ -243,12 +257,12 @@ const treemapSlice = createSlice({
             ...state,
             mainTreemap: {
               ...state.mainTreemap,
-              currentStatsPath: newPath
-            }
-          }
+              currentStatsPath: newPath,
+            },
+          };
         }
         console.log("scopeStatsIn", "not changed");
-        return state
+        return state;
       }
     },
     // click on a folder node
@@ -261,36 +275,34 @@ const treemapSlice = createSlice({
         let newData = goThroughTree(state.tree, nextPath);
         console.log("scopeTreemapIn", newData, nextPath);
 
-        if (newData && newData.children) {
-          const prevStack = Array.from(state.mainTreemap.previousPathStack)
-          prevStack.push(
-            state.mainTreemap.currentVisualizationPath
-          );
+        if (newData && nodeWithChildren(newData)) {
+          const prevStack = Array.from(state.mainTreemap.previousPathStack);
+          prevStack.push(state.mainTreemap.currentVisualizationPath);
           return {
             ...state,
             mainTreemap: {
               ...state.mainTreemap,
               previousPathStack: prevStack,
               currentVisualizationPath: nextPath,
-              currentStatsPath: nextPath
+              currentStatsPath: nextPath,
             },
             simulation: {
               ...state.simulation,
               miniTreemap: {
                 ...state.simulation.miniTreemap,
-                visualizationPath: nextPath
-              }
-            }
-          }
+                visualizationPath: nextPath,
+              },
+            },
+          };
         }
-        return state
+        return state;
       }
     },
     // click the back button
     scopeMainTreemapOut: (state) => {
-      const newStack = Array.from(state.mainTreemap.previousPathStack)
+      const newStack = Array.from(state.mainTreemap.previousPathStack);
       const nextPath = newStack.pop();
-      const fullData = state.tree
+      const fullData = state.tree;
 
       if (nextPath) {
         let newData = goThroughTree(fullData, nextPath);
@@ -301,16 +313,16 @@ const treemapSlice = createSlice({
             ...state.mainTreemap,
             previousPathStack: newStack,
             currentVisualizationPath: nextPath,
-            currentStatsPath: nextPath
+            currentStatsPath: nextPath,
           },
           simulation: {
             ...state.simulation,
             miniTreemap: {
               ...state.simulation.miniTreemap,
-              visualizationPath: nextPath
-            }
-          }
-        }
+              visualizationPath: nextPath,
+            },
+          },
+        };
       }
     },
     scopeMiniTreemapIn: (state, action) => {
@@ -319,7 +331,7 @@ const treemapSlice = createSlice({
         console.log(
           "scopeMiniTreemapIn",
           nextPath,
-          state.simulation.removedAuthors,
+          state.simulation.removedAuthors
         );
 
         return {
@@ -329,34 +341,33 @@ const treemapSlice = createSlice({
             lastUsedRemovedAuthorsList: state.simulation.removedAuthors,
             miniTreemap: {
               ...state.simulation.miniTreemap,
-              visualizationPath: nextPath
-            }
-          }
-        }
+              visualizationPath: nextPath,
+            },
+          },
+        };
       }
     },
     scopeMiniTreemapOut: (state, action) => {
       const nextPath = action.payload.path;
-      console.log("scopeMiniTreemapOut",
-        nextPath);
+      console.log("scopeMiniTreemapOut", nextPath);
       return {
         ...state,
         simulation: {
           ...state.simulation,
           miniTreemap: {
             ...state.simulation.miniTreemap,
-            visualizationPath: nextPath
-          }
-        }
-      }
+            visualizationPath: nextPath,
+          },
+        },
+      };
     },
     addFilter: (state, action) => {
       const newFilterExps = action.payload;
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
         return {
           ...state,
-          filters: [...new Set(state.filters.concat(newFilterExps))]
-        }
+          regexFilters: [...new Set(state.regexFilters.concat(newFilterExps))],
+        };
       }
     },
     removeFilter: (state, action) => {
@@ -364,39 +375,60 @@ const treemapSlice = createSlice({
       if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
         return {
           ...state,
-          filters: state.filters.filter(
+          regexFilters: state.regexFilters.filter(
             (element) => !newFilterExps.includes(element)
-          )
-        }
+          ),
+        };
       }
     },
-    removeAllFilters: (state, action) => {
+    addExtensionFilter: (state, action) => {
+      const newFilterExps = action.payload;
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        return {
+          ...state,
+          extensionFilters: [...new Set(state.extensionFilters.concat(newFilterExps))],
+        };
+      }
+    },
+    removeExtensionFilter: (state, action) => {
+      const newFilterExps = action.payload;
+      if (Array.isArray(newFilterExps) && newFilterExps.length > 0) {
+        return {
+          ...state,
+          extensionFilters: state.extensionFilters.filter(
+            (element) => !newFilterExps.includes(element)
+          ),
+        };
+      }
+    },
+    removeAllFilters: (state) => {
       return {
         ...state,
-        filters: []
-      }
+        regexFilters: [],
+        extensionFilters: [],
+      };
     },
     enableSimulationMode: (state, action) => {
       return {
         ...state,
         simulation: {
           ...state.simulation,
-          isSimulationMode: true
-        }
-      }
+          isSimulationMode: true,
+        },
+      };
     },
     disableSimulationMode: (state, action) => {
       return {
         ...state,
         simulation: {
           ...state.simulation,
-          isSimulationMode: false
-        }
-      }
+          isSimulationMode: false,
+        },
+      };
     },
     addAuthorToRemovalList: (state, action) => {
       const authors = action.payload;
-      const removedAuthors = state.simulation.removedAuthors
+      const removedAuthors = state.simulation.removedAuthors;
       return {
         ...state,
         simulation: {
@@ -404,9 +436,9 @@ const treemapSlice = createSlice({
           lastUsedRemovedAuthorsList: removedAuthors,
           removedAuthors: [
             ...new Set(state.simulation.removedAuthors.concat(authors)),
-          ]
-        }
-      }
+          ],
+        },
+      };
     },
     undoAuthorRemoval: (state, action) => {
       const authors = action.payload;
@@ -416,23 +448,66 @@ const treemapSlice = createSlice({
           ...state.simulation,
           removedAuthors: state.simulation.removedAuthors.filter(
             (element) => !authors.includes(element)
-          )
-        }
-      }
+          ),
+        },
+      };
     },
     clearAuthorRemovalList: (state) => {
-      const removedAuthors = state.simulation.removedAuthors
+      const removedAuthors = state.simulation.removedAuthors;
       return {
         ...state,
         simulation: {
           ...state.simulation,
           lastUsedRemovedAuthorsList: removedAuthors,
-          removedAuthors: []
-        }
-      }
+          removedAuthors: [],
+        },
+      };
+    },
+    setColorThresholds: (state, action) => {
+      const newThresholds = action.payload;
+      console.log("setColorThresholds", newThresholds);
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          thresholds: newThresholds,
+        },
+      };
+    },
+    resetColorThresholdsToDefaults: (state) => {
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          thresholds: defaultColorThresholds,
+        },
+      };
+    },
+    setColors: (state, action) => {
+      const newColors = action.payload;
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          colors: newColors,
+        },
+      };
+    },
+    resetColorsToDefaults: (state) => {
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          colors: defaultColors,
+        },
+      };
     },
   },
 });
+
+export function nodeWithChildren(node) {
+  return node.children && node.children.length > 0
+}
 
 // Exports
 export const {
@@ -444,10 +519,16 @@ export const {
   returnMainTreemapHome,
   // regex filter actions
   addFilter,
+  addExtensionFilter,
   removeFilter,
+  removeExtensionFilter,
   removeAllFilters,
-  // inclusion filter methods
-  // Simulation Mode Actions
+  // color and color threshold actions
+  setColors,
+  resetColorsToDefaults,
+  setColorThresholds,
+  resetColorThresholdsToDefaults,
+  // simulation mode actions
   enableSimulationMode,
   disableSimulationMode,
   returnMiniTreemapHome,
@@ -459,7 +540,10 @@ export const {
 //treemap data selectors
 export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
 export const selectCurrentVisualizationData = (state) =>
-  goThroughTree(state.treemap.tree, state.treemap.mainTreemap.currentVisualizationPath);
+  goThroughTree(
+    state.treemap.tree,
+    state.treemap.mainTreemap.currentVisualizationPath
+  );
 export const selectCurrentVisualizationPath = (state) =>
   state.treemap.mainTreemap.currentVisualizationPath;
 export const selectCurrentStatsData = (state) =>
@@ -468,12 +552,13 @@ export const selectCurrentStatsData = (state) =>
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
-export const selectAllFilters = (state) => state.treemap.filters;
+export const selectAllFilters = (state) => state.treemap.regexFilters;
+export const selectExtensionFilters = (state) => state.treemap.extensionFilters;
 //simulation mode selectors
 export const isSimulationMode = (state) =>
   state.treemap.simulation.isSimulationMode;
 export const simulationVisualizationData = (state) => {
-  const path = state.treemap.simulation.miniTreemap.visualizationPath
+  const path = state.treemap.simulation.miniTreemap.visualizationPath;
   // TODO: add recalculation logic authors
   if (state.treemap.simulation.isSimulationMode) {
     const newData = getDataRecalculated(
@@ -485,8 +570,14 @@ export const simulationVisualizationData = (state) => {
     return getBusFactorDeltas(oldData, newData);
   }
   // TODO: replace
-  return initializeBusFactorDeltaProperties(goThroughTree(state.treemap.tree, path))
-}
+  return initializeBusFactorDeltaProperties(
+    goThroughTree(state.treemap.tree, path)
+  );
+};
+
+export const selectColorThresholds = (state) =>
+  state.treemap.mainTreemap.thresholds;
+export const selectColorPalette = (state) => state.treemap.mainTreemap.colors;
 
 export const simulationVisualizationPath = (state) =>
   state.treemap.simulation.miniTreemap.visualizationPath;

@@ -125,6 +125,7 @@ function SimulationModeModal(props) {
   };
 
   return (
+
     <>
       <Island>
         <Header border>
@@ -272,7 +273,7 @@ function SimulationModeModal(props) {
                             checkbox: !removedAuthorsList.includes(authorScorePair.email)
                           }
                         ))
-                      : {}
+                      : []
                   }
                 />
 

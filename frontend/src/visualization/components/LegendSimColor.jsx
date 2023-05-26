@@ -29,7 +29,7 @@ function LegendSimColor(props) {
       <div
         id="legend-color-mini"
         className="row mt-2 mx-2">
-          <h5> Color </h5>
+          <h6> Color </h6>
         {scale.map((element) => {
           return (
             <div
@@ -47,11 +47,11 @@ function LegendSimColor(props) {
         id="offcanvasWithBothOptions"
         aria-labelledby="offcanvasWithBothOptionsLabel">
         <div className="offcanvas-header">
-          <h5
+          <h6
             className="offcanvas-title"
             id="offcanvasWithBothOptionsLabel">
             Backdrop with scrolling
-          </h5>
+          </h6>
           <button
             type="button"
             className="btn-close"

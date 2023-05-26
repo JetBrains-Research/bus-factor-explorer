@@ -81,7 +81,7 @@ export default function ChartEditor(props) {
 
   useEffect(() => {
     loadChart(owner, repo, (response) =>
-      setState({data: response || [], layout: [], frames: []})
+      setState({data: response.data || [], layout: response.layout || [], frames: response.frames || []})
     )
     loadCSV(owner, repo);
   }, []);
@@ -114,7 +114,7 @@ export default function ChartEditor(props) {
           dataSourceOptions={dataSourceOptions}
           plotly={plotly}
           onUpdate={(data, layout, frames) => {
-            saveChart(owner, repo, data)
+            saveChart(owner, repo, {data: data, layout: layout, frames: frames})
             setState({data, layout, frames});
           }}
           useResizeHandler

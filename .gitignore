@@ -43,3 +43,5 @@ bucket.yml
 bucket.txt
 data
 plugin
+/frontend/node_modules/
+/frontend/node/

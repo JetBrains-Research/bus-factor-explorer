@@ -16,7 +16,9 @@ function RightColumn({statsData}) {
         <StatsPane data={statsData}/>
       )}
       {addMargin(<center>
-        <LegendColor/>
+        <LegendColor
+          summary={"Colors can be picked by clicking on the squares below"}>
+        </LegendColor>
       </center>
       )}
       <ExploreData
