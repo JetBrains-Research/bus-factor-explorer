@@ -68,7 +68,7 @@ fun Application.module() {
 
             artifactController(artifactService)
             gitHubSearchController(searchService, taskService, artifactService)
-            taskController(taskService, listener, artifactService)
+            taskController(taskService, listener, artifactService, workingDir)
         }
     }
 }
