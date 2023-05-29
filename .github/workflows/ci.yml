@@ -10,7 +10,11 @@ jobs:
         with:
           java-version: 17
           distribution: temurin
-      - name: Linter
+      - name: Check GitHub workflows files
+        uses: docker://rhysd/actionlint:latest
+        with:
+          args: -color
+      - name: Lint kotlin
         run: ./gradlew ktlintCheck
       - name: Test
         run: ./gradlew test
