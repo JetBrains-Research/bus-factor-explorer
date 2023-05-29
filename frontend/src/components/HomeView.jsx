@@ -25,28 +25,19 @@ export class HomeView extends React.Component {
       queryValue: "",
       loadProgress: 0.0,
       intervalId: undefined,
-      requestingStatus: false
     };
-  }
-
-  setRequestStatus(value) {
-    this.setState({
-      requestingStatus: value
-    })
   }
 
   requestStatus() {
     requestStatusOfTasks((data) => {
-      let requestingStatus = false
-      for (const job of data) {
-
+      data.forEach((job) => {
         switch (job.status) {
           case RUNNING_STATUS:
-            requestingStatus = true
+            this.setRepositoryStatus(job.owner, job.repo, RUNNING_STATUS)
             break
           case ERROR_STATUS:
             this.onCloseAlertClickPRKey(Alert.Type.MESSAGE, job.owner, job.repo);
-            this.createAlert(Alert.Type.ERROR, `Internal Server Error for ${job.owner}/${job.repo} : ${job.message}`);
+            this.createAlert(Alert.Type.ERROR, `Calculation for ${job.owner}/${job.repo} failed: ${job.message}`);
             this.setRepositoryStatus(job.owner, job.repo, NEED_LOAD)
             break
           case FINISHED_STATUS:
@@ -55,19 +46,15 @@ export class HomeView extends React.Component {
             this.setRepositoryStatus(job.owner, job.repo, READY)
             break
         }
-      }
-      this.setRequestStatus(requestingStatus)
-      console.log(data)
+      });
     })
   }
 
   componentDidMount() {
     this.requestStatus()
     const intervalId = setInterval(() => {
-      if (this.state.requestingStatus) {
-        this.requestStatus()
-      }
-    }, 5000);
+      this.requestStatus()
+    }, 1000);
     this.setState({
       intervalId: intervalId
     })
@@ -81,12 +68,20 @@ export class HomeView extends React.Component {
   setRepositoryStatus(owner, repo, status) {
     const data = this.state.projects
     const project = data.find(it => it.info.name === owner)
-    const repository = project.repositories.find(it => it.name === repo)
-    repository.status = status
-
-    if (status === RUNNING) {
-      this.setRequestStatus(true)
+    if (!project) {
+      return
     }
+
+    let repository = project.repositories.find(it => it.name === repo)
+    if (!repository) {
+      repository = {
+        name: repo,
+        description: '',
+        cloneUrl: `https://github.com/${owner}/${repo}.git`
+      }
+      project.repositories.push(repository)
+    }
+    repository.status = status
 
     this.setState({
       projects: data
@@ -185,21 +180,25 @@ export class HomeView extends React.Component {
 
   onCloseAlertClick(alert) {
     const alertToClose = this.state.alerts.filter(it => alert.key === it.key)[0];
-    alertToClose.isClosing = true;
-    this.setState(prevState => ({
-      ...prevState,
-      alerts: [...prevState.alerts],
-    }));
+    if (alertToClose) {
+      alertToClose.isClosing = true;
+      this.setState(prevState => ({
+        ...prevState,
+        alerts: [...prevState.alerts],
+      }));
+    }
   };
 
   onCloseAlertClickPRKey(type, owner, repo) {
     const key = this.createPRKey(type, owner, repo)
     const alertToClose = this.state.alerts.filter(it => key === it.key)[0];
-    alertToClose.isClosing = true;
-    this.setState(prevState => ({
-      ...prevState,
-      alerts: [...prevState.alerts],
-    }));
+    if (alertToClose) {
+      alertToClose.isClosing = true;
+      this.setState(prevState => ({
+        ...prevState,
+        alerts: [...prevState.alerts],
+      }));
+    }
   };
 
   createPRKey(type, owner, repo) {
