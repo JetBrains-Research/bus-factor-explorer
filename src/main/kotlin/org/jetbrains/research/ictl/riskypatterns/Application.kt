@@ -32,7 +32,7 @@ fun Application.module() {
     val workingDir = File("./working")
     for (file in listOf(artifactDir, workingDir)) {
         if (!file.exists()) {
-            Files.createDirectory(file.toPath());
+            Files.createDirectory(file.toPath())
         }
         if (!file.isDirectory) {
             throw RuntimeException("${file.absolutePath} must be a directory")
