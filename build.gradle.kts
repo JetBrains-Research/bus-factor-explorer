@@ -8,7 +8,7 @@ plugins {
 
     kotlin("plugin.serialization").version("1.7.22")
 
-    id("org.jlleitschuh.gradle.ktlint") version "11.2.0"
+    id("org.jlleitschuh.gradle.ktlint") version "11.3.2"
 }
 
 group = "org.jetbrains.research"
@@ -97,6 +97,7 @@ tasks {
         }
         to {
             image = "ghcr.io/jetbrains-research/bus-factor-explorer/${rootProject.name}:$version"
+            tags = setOf("latest", "$version")
         }
         // jgit config file
         container {

@@ -23,21 +23,29 @@ import org.jetbrains.research.ictl.riskypatterns.service.task.ComputeBusFactorJo
 import org.jetbrains.research.ictl.riskypatterns.service.task.TaskService
 import org.jetbrains.research.ictl.riskypatterns.service.task.listener.JobExecutionEventListener
 import java.io.File
+import java.nio.file.Files
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
-    val artifactService = ArtifactService(FSArtifactStorage(File("/tmp/artifacts")))
+    val artifactDir = File("./artifacts")
+    val workingDir = File("./working")
+    for (file in listOf(artifactDir, workingDir)) {
+        if (!file.exists()) {
+            Files.createDirectory(file.toPath())
+        }
+        if (!file.isDirectory) {
+            throw RuntimeException("${file.absolutePath} must be a directory")
+        }
+    }
+
+    val artifactService = ArtifactService(FSArtifactStorage(artifactDir))
     val listener = JobExecutionEventListener()
     val client = GitHubClient()
     val searchService = GitHubSearchService(client)
     val taskService = TaskService(
         listener,
-        ComputeBusFactorJob(
-            File("/tmp/working"),
-            artifactService,
-            client,
-        ),
+        ComputeBusFactorJob(workingDir, artifactService, client),
     ).also { service ->
         service.start()
         environment.monitor.subscribe(ApplicationStopped) {
