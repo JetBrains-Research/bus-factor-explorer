@@ -97,6 +97,7 @@ tasks {
         }
         to {
             image = "ghcr.io/jetbrains-research/bus-factor-explorer/${rootProject.name}:$version"
+            tags = setOf("latest", "$version")
         }
         // jgit config file
         container {
