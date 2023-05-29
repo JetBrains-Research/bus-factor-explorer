@@ -26,7 +26,7 @@ Docker Compose configuration is also [available](docker-compose.yml) in the repo
 ## Usage
 Simple scenario:
 1. Open the main page;
-2. Search for a repository. Tou can use [advanced GitHub search](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories) syntax; 
+2. Search for a repository. You can use [advanced GitHub search](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories) syntax; 
 3. Click on the repository and wait for the calculation to finish;
 4. Reload the main page and click on the repository in the main page;
 5. Explore bus factor data using built-in visualization, or process the results externally using `Explore Data` panel.
