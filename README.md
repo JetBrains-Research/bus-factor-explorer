@@ -41,5 +41,9 @@ To evaluate our tool, we computed the bus factor of 935 popular repositories on 
 The results are available in the `evaluation` directory.
 
 #### Local development
+Build and start:
 1. Run `./gradlew jibDockerBuild`
 2. Run `docker compose up`
+
+Auto-format code:
+1. Run `./gradlew ktlintFormat`

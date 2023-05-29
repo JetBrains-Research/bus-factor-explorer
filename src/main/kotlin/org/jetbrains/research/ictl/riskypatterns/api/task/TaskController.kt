@@ -14,6 +14,7 @@ import org.jetbrains.research.ictl.riskypatterns.service.artifact.ArtifactServic
 import org.jetbrains.research.ictl.riskypatterns.service.task.TaskPayload
 import org.jetbrains.research.ictl.riskypatterns.service.task.TaskService
 import org.jetbrains.research.ictl.riskypatterns.service.task.listener.JobExecutionEventListener
+import java.io.File
 import java.nio.file.Paths
 import kotlin.io.path.exists
 import kotlin.io.path.readText
@@ -22,6 +23,7 @@ fun Route.taskController(
     taskService: TaskService,
     listener: JobExecutionEventListener,
     artifactService: ArtifactService,
+    workingDir: File,
 ) {
     route("/task") {
         post("/submit") {
@@ -64,7 +66,7 @@ fun Route.taskController(
         get("/log") {
             val (projectKey, repositoryName) = call.getOwnerAndRepo()
 
-            val logFile = Paths.get("/tmp/working", projectKey, repositoryName, "log.log")
+            val logFile = Paths.get(workingDir.absolutePath, projectKey, repositoryName, "log.log")
             val log = if (logFile.exists()) {
                 logFile.readText()
             } else {
