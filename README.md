@@ -14,6 +14,8 @@ at the same time.
 Our tool allows users to identify the files and subsystems at risk of stalling in the event of developer turnover 
 by analyzing the VCS history.
 
+Demo is available on [YouTube](https://youtu.be/uIoV79N14z8).
+
 ## Quick start
 Docker:
 ```shell
@@ -22,8 +24,6 @@ docker run -p 8080:8080 -it ghcr.io/jetbrains-research/bus-factor-explorer/bus-f
 Docker compose configuration is also available in the repository.
 
 ## Usage
-Demo is available on [YouTube](https://youtu.be/uIoV79N14z8).
-
 Simple scenario:
 1. Open main page
 2. To search repos, you can use [advanced GitHub search](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories). 
