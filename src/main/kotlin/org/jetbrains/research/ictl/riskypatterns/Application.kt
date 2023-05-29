@@ -28,8 +28,9 @@ import java.nio.file.Files
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
-    val artifactDir = File("./artifacts")
-    val workingDir = File("./working")
+    val homeDir = System.getProperty("user.home")
+    val artifactDir = File(homeDir, "artifacts")
+    val workingDir = File(homeDir, "working")
     for (file in listOf(artifactDir, workingDir)) {
         if (!file.exists()) {
             Files.createDirectory(file.toPath())

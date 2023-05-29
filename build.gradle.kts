@@ -99,10 +99,6 @@ tasks {
             image = "ghcr.io/jetbrains-research/bus-factor-explorer/${rootProject.name}:$version"
             tags = setOf("latest", "$version")
         }
-        // jgit config file
-        container {
-            jvmFlags = listOf("-Duser.home=/tmp")
-        }
     }
 
     test {
