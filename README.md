@@ -22,14 +22,16 @@ docker run -p 8080:8080 -it ghcr.io/jetbrains-research/bus-factor-explorer/bus-f
 Docker compose configuration is also available in the repository.
 
 ## Usage
+Demo is available on [YouTube](https://youtu.be/uIoV79N14z8).
+
+Simple scenario:
 1. Open main page
 2. To search repos, you can use [advanced GitHub search](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories). 
 3. Click on the repository and wait for calculating a bus factor
 4. Reload the main page and click on the repository on the main page
 5. Explore bus factor data using built-in visualization or process results using `Explore Data` panel
 
-## Example
-Demo is available on [YouTube](https://youtu.be/uIoV79N14z8).
+## Screenshots
 ![Treemap](./docs/treemap.png)
 ![Visualization built with chart editor](./docs/plotly.png)
 ![Simulation mode](./docs/simulation_mode.png)
