@@ -18,9 +18,10 @@ jobs:
       - name: Build Docker container and publish to GitHub Packages
         env:
           CI: "" # disable eslint
-        run: ./gradlew jib \
-          -Djib.to.auth.username=${{ github.actor }} \
-          -Djib.to.auth.password=${{ github.token }} \
-          -Djib.from.platforms=linux/amd64,linux/arm64
+        run: |
+          ./gradlew jib \
+            -Djib.to.auth.username=${{ github.actor }} \
+            -Djib.to.auth.password=${{ github.token }} \
+            -Djib.from.platforms=linux/amd64,linux/arm64
 
 
