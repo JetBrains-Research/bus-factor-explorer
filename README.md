@@ -38,7 +38,7 @@ Simple scenario:
 
 ## Evaluation
 To evaluate our tool, we computed the bus factor of 935 popular repositories on GitHub.
-The results are available in the `evaluation` directory.
+The results are available in the [`evaluation`](./evaluation) directory.
 
 #### Local development
 1. Run `./gradlew jibDockerBuild`
