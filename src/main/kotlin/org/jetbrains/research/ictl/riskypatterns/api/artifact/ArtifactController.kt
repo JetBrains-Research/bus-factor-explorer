@@ -3,7 +3,6 @@ package org.jetbrains.research.ictl.riskypatterns.api.artifact
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
-import io.ktor.server.plugins.NotFoundException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
@@ -73,10 +72,7 @@ fun Route.artifactController(artifactService: ArtifactService) {
             get("/load") {
                 val (owner, repo) = call.getOwnerAndRepo()
 
-                call.respondText {
-                    artifactService.getChart(owner, repo)
-                        .orElseThrow { NotFoundException("Chart not found") }
-                }
+                call.respondText(artifactService.getChart(owner, repo).orElse(EMPTY_CHART_CONFIG))
             }
 
             post("/save") {
@@ -88,3 +84,5 @@ fun Route.artifactController(artifactService: ArtifactService) {
         }
     }
 }
+
+private const val EMPTY_CHART_CONFIG = "{}"
