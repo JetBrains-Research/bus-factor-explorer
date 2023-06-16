@@ -1,6 +1,9 @@
 package org.jetbrains.research.ictl.riskypatterns.service.task
 
+import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.jetbrains.research.ictl.riskypatterns.calculation.BusFactor
+import org.jetbrains.research.ictl.riskypatterns.jgit.CommitsProvider
+import org.jetbrains.research.ictl.riskypatterns.jgit.FileInfoProvider
 import org.jetbrains.research.ictl.riskypatterns.service.artifact.ArtifactService
 import org.jetbrains.research.ictl.riskypatterns.service.github.GitHubClient
 import org.jetbrains.research.ictl.riskypatterns.service.task.listener.EventLevel
@@ -64,8 +67,12 @@ class ComputeBusFactorJob(
 
             val bots = gitHubClient.loadBots(payload.owner, payload.repo)
             val started = System.currentTimeMillis()
-            val busFactor = BusFactor(File(executionEnvironment.gitDir, ".git"), bots)
-            val tree = busFactor.calculate(payload.fullName)
+            val busFactor = BusFactor(bots)
+            val gitDir = File(executionEnvironment.gitDir, ".git")
+            val repository = FileRepository(gitDir)
+            val commitsProvider = CommitsProvider(repository)
+            val fileInfoProvider = FileInfoProvider(repository)
+            val tree = busFactor.calculate(payload.fullName, commitsProvider, fileInfoProvider)
             val ended = System.currentTimeMillis()
 
             executionEnvironment.logFile.log("Finished task: [${payload.fullName}]")
