@@ -23,9 +23,13 @@ application {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://packages.jetbrains.team/maven/p/ictl-public/public-maven")
+    }
 }
 
 dependencies {
+    implementation("org.jetbrains.research.ictl:bf-core:0.0.3")
     implementation("io.ktor:ktor-server-metrics-micrometer")
     implementation("io.micrometer:micrometer-registry-prometheus:1.10.5")
 
