@@ -40,8 +40,8 @@ export const CONFIG = {
       maxBusFactorValue: 10,
     },
     classes: {
-      folderIcon: "bi bi-folder2",
-      rectWrapperChild: "row p-0 m-0 align-items-center fw-semibold h-100",
+      folderIcon: "bi bi-folder2 mb-0",
+      rectWrapperChild: "row p-0 m-0 align-items-center h-100",
       rectWrapperParent: "row px-1 fw-semibold",
     },
     children: {
@@ -53,11 +53,11 @@ export const CONFIG = {
       },
       textBox: {},
       icon: {
-        fontSize: "1.5em",
+        fontSize: "1em",
         miniFontSize: "1em"
       },
       p: {
-        fontSize: "0.8em",
+        fontSize: "0.7em",
         miniFontSize: "0.6em"
       },
     },

@@ -3,6 +3,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { calculateBusFactor } from "../utils/BusFactorUtil";
 import { CONFIG } from "../config";
+import { binary, squarify } from "../d3/tiling";
+import { ascending } from "d3";
+
 
 const defaultColors = [
   CONFIG.general.colors.jetbrains.gray,
@@ -12,6 +15,10 @@ const defaultColors = [
 ];
 
 const defaultColorThresholds = [2, 5];
+
+const defaultTilingFunction = "binary";
+const defaultSortingKey = "name";
+const defaultSortingOrder = "ascending";
 
 const defaultTree = {
   name: "PlaceHolder",
@@ -49,6 +56,9 @@ function convertTreeToState(tree) {
       previousPathStack: [],
       thresholds: defaultColorThresholds,
       colors: defaultColors,
+      tilingFunction: defaultTilingFunction,
+      sortingKey: defaultSortingKey,
+      sortingOrder: defaultSortingOrder,
     },
     simulation: {
       isSimulationMode: false,
@@ -62,6 +72,7 @@ function convertTreeToState(tree) {
     },
     extensionFilters: [],
     regexFilters: [],
+    folderFilter: false,
   };
 }
 
@@ -502,6 +513,42 @@ const treemapSlice = createSlice({
         },
       };
     },
+    setTilingFunction: (state, action) => {
+      const newTilingFunction = action.payload;
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          tilingFunction: newTilingFunction
+        }
+      }
+    },
+    setSortingKey: (state, action) => {
+      const newSortingKey = action.payload;
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          sortingKey: newSortingKey
+        }
+      }
+    },
+    setSortingOrder: (state, action) => {
+      const newSortingOrder = action.payload;
+      return {
+        ...state,
+        mainTreemap: {
+          ...state.mainTreemap,
+          sortingOrder: newSortingOrder
+        }
+      }
+    },
+    toggleFolderFilter: (state) => {
+      return {
+        ...state,
+        folderFilter: !state.folderFilter
+      }
+    }
   },
 });
 
@@ -517,12 +564,13 @@ export const {
   scopeMainTreemapIn,
   scopeMainTreemapOut,
   returnMainTreemapHome,
-  // regex filter actions
+  // filter actions
   addFilter,
   addExtensionFilter,
   removeFilter,
   removeExtensionFilter,
   removeAllFilters,
+  toggleFolderFilter,
   // color and color threshold actions
   setColors,
   resetColorsToDefaults,
@@ -536,6 +584,10 @@ export const {
   scopeMiniTreemapOut,
   addAuthorToRemovalList,
   undoAuthorRemoval,
+  // sorting and layout actions
+  setSortingKey,
+  setSortingOrder,
+  setTilingFunction,
 } = treemapSlice.actions;
 //treemap data selectors
 export const selectFullData = (state) => state.treemap.mainTreemap.fullData;
@@ -552,7 +604,8 @@ export const selectCurrentStatsData = (state) =>
 export const selectCurrentStatsPath = (state) =>
   state.treemap.mainTreemap.currentStatsPath;
 //filter selectors
-export const selectAllFilters = (state) => state.treemap.regexFilters;
+export const selectFolderFilter = (state) => state.treemap.folderFilter;
+export const selectRegexFilters = (state) => state.treemap.regexFilters;
 export const selectExtensionFilters = (state) => state.treemap.extensionFilters;
 //simulation mode selectors
 export const isSimulationMode = (state) =>
@@ -583,4 +636,8 @@ export const simulationVisualizationPath = (state) =>
   state.treemap.simulation.miniTreemap.visualizationPath;
 export const selectRemovedAuthors = (state) =>
   state.treemap.simulation.removedAuthors;
+export const selectTilingFunction = (state) => state.treemap.mainTreemap.tilingFunction;
+export const selectSortingOrder = (state) => state.treemap.mainTreemap.sortingOrder;
+export const selectSortingKey = (state) => state.treemap.mainTreemap.sortingKey;
+
 export default treemapSlice.reducer;

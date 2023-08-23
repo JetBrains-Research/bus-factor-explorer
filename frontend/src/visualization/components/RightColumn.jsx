@@ -4,8 +4,8 @@ import React from "react";
 import LegendColor from "./LegendColor";
 import StatsPane from "./StatsPane";
 import {addMargin} from "./Navigator";
-import {ExploreData} from "./ExploreData";
 import {useParams} from "react-router-dom";
+import {ExploreData} from "./ExploreData";
 
 function RightColumn({statsData}) {
   const {owner, repo} = useParams()

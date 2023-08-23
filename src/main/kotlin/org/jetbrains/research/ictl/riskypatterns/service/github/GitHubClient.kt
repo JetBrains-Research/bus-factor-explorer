@@ -108,6 +108,9 @@ class GitHubClient(
             .body<List<ContributorItem>>()
             .filter { it.type == BOT_TYPE }
             .mapTo(mutableSetOf()) { it.login }
+
+    suspend fun loadContributors(owner: String, repo: String) =  httpClient.get(GetGitHubRepository.Contributors(GetGitHubRepository(), owner, repo))
+        .body<List<ContributorItem>>()
 }
 
 /**
@@ -132,7 +135,7 @@ class GetGitHubRepository() {
     @Resource("/{owner}/{repo}")
     class Owner(val parent: GetGitHubRepository = GetGitHubRepository(), val owner: String, val repo: String)
 
-    @Resource("/{owner}/{repo}/contributors")
+    @Resource("/{owner}/{repo}/contributors?q=per_page:100")
     class Contributors(val parent: GetGitHubRepository = GetGitHubRepository(), val owner: String, val repo: String)
 }
 

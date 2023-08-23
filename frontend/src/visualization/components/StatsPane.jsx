@@ -153,7 +153,7 @@ function StatsPane(props) {
           <h6>Author Contribution</h6>
           {authorsList && topAuthors ? (
             <List
-              maxHeight={400}
+              maxHeight={window.innerHeight/3}
               compact={true}
               shortcuts={true}
               data={topAuthors.map((authorScorePair, index) => {
