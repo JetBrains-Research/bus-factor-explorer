@@ -48,6 +48,7 @@ const defaultTree = {
 function convertTreeToState(tree) {
   return {
     tree: tree,
+    usersMerged: tree.usersMerged,
     mainTreemap: {
       currentStatsPath: tree.path,
       currentVisualizationPath: tree.path,
@@ -639,5 +640,6 @@ export const selectRemovedAuthors = (state) =>
 export const selectTilingFunction = (state) => state.treemap.mainTreemap.tilingFunction;
 export const selectSortingOrder = (state) => state.treemap.mainTreemap.sortingOrder;
 export const selectSortingKey = (state) => state.treemap.mainTreemap.sortingKey;
+export const selectUsersMerged = (state) => state.treemap.usersMerged
 
 export default treemapSlice.reducer;

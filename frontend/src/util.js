@@ -40,8 +40,8 @@ export function requestActive(callback) {
   sendRequest("task/active", {}, callback)
 }
 
-export function requestBusFactorGraph(repo, callback, trackProgress) {
-  sendRequest("artifact/busFactor/json", repo, callback, trackProgress)
+export function requestBusFactorGraph(repo, usersMerged, callback, trackProgress) {
+  sendRequest("artifact/busFactor/json", repo, usersMerged, callback, trackProgress)
 }
 
 export function requestProjects(term, callback, trackProgress) {

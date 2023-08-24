@@ -1,12 +1,12 @@
 /** @format */
 
-import React, {useEffect, useMemo, useRef, useState} from "react";
+import React, {useDeferredValue, useEffect, useMemo, useRef, useState} from "react";
 import * as d3 from "d3";
 import {dispatch} from "d3";
 import {
   addAuthorToRemovalList,
   disableSimulationMode,
-  enableSimulationMode,
+  enableSimulationMode, selectFolderFilter, selectUsersMerged, setMergedUsers, setNewTree,
   undoAuthorRemoval,
 } from "../reducers/treemapSlice";
 import {useTranslation} from "react-i18next";
@@ -15,6 +15,9 @@ import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
 import Content from "@jetbrains/ring-ui/dist/island/content";
 import List from "@jetbrains/ring-ui/dist/list/list";
+import Toggle from "@jetbrains/ring-ui/dist/toggle/toggle";
+import {useDispatch, useSelector} from "react-redux";
+import {requestBusFactorGraph} from "../../util";
 
 function StatsPane(props) {
   const {t, i18n} = useTranslation();
@@ -24,6 +27,9 @@ function StatsPane(props) {
   const isFirstRender = useRef(true);
   const [numOfAuthors, setNumOfAuthors] = useState(0);
   const [inSimulationMode, setSimulationMode] = useState(false);
+
+  const dispatch = useDispatch()
+  const usersMerged = useDeferredValue(useSelector(selectUsersMerged));
 
   const nodeData = props.data;
   const nodeBusFactor = useMemo(
@@ -151,6 +157,24 @@ function StatsPane(props) {
           </ul>
 
           <h6>Author Contribution</h6>
+
+          <Toggle checked={usersMerged} onChange={(e) => {
+            const usersMerged = e.target.checked
+            requestBusFactorGraph(
+              {
+                owner: props.owner,
+                repo: props.repo
+              },
+              usersMerged,
+              (response) => {
+                // setLoaded(true)
+                dispatch(setNewTree(response))
+                // setInitialized(true)
+              },
+              // setProgress
+            )
+          }}>Merge users</Toggle>
+
           {authorsList && topAuthors ? (
             <List
               maxHeight={window.innerHeight/3}

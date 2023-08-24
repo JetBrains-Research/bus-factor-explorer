@@ -19,7 +19,9 @@ function VisualizationView() {
       {
         owner: owner,
         repo: repo
-      }, (response) => {
+      },
+      true,
+      (response) => {
         setLoaded(true)
         dispatch(setNewTree(response))
         setInitialized(true)

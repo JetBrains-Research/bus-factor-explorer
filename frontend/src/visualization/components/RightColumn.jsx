@@ -13,7 +13,7 @@ function RightColumn({statsData}) {
   return (
     <div className="col p-1">
       {addMargin(
-        <StatsPane data={statsData}/>
+        <StatsPane data={statsData} owner={owner} repo={repo}/>
       )}
       {addMargin(<center>
         <LegendColor
