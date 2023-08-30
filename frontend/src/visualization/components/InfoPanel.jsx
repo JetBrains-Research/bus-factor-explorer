@@ -42,7 +42,7 @@ function OffCanvasSideBar(props) {
               if (text.startsWith && text.startsWith("http")) {
                 return <a key={text} href={text}>{text + "\n"}</a>;
               } else {
-                return text;
+                return text + "\n";
               }
             })}
           </p>
@@ -59,8 +59,7 @@ export function InfoPanel(props) {
       <OffCanvasSideBar
         divName={props.divName}
         header={props.header}
-        body={props.body}>
-      </OffCanvasSideBar>
+        body={props.body}></OffCanvasSideBar>
     </>
   );
 }

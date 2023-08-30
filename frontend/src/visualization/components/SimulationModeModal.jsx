@@ -1,14 +1,14 @@
 /** @format */
 
-import {format} from "../d3/format.tsx";
+import { format } from "../d3/format.tsx";
 import * as tiling from "../d3/tiling.tsx";
-import React, {useState} from "react";
-import {CONFIG} from "../config";
+import React, { useState } from "react";
+import { CONFIG } from "../config";
 import TreeMap from "./TreeMap";
 
-import {generateBreadcrumb} from "../utils/url.tsx";
-import {useTranslation} from "react-i18next";
-import {InfoPanel} from "./InfoPanel";
+import { generateBreadcrumb } from "../utils/url.tsx";
+import { useTranslation } from "react-i18next";
+import { InfoPanel } from "./InfoPanel";
 import {
   addAuthorToRemovalList,
   disableSimulationMode,
@@ -17,31 +17,38 @@ import {
   selectRemovedAuthors,
   undoAuthorRemoval,
 } from "../reducers/treemapSlice.js";
-import {payloadGenerator} from "../utils/reduxActionPayloadCreator.tsx";
-import {useSelector} from "react-redux";
-import {Modal} from "react-bootstrap";
+import { payloadGenerator } from "../utils/reduxActionPayloadCreator.tsx";
+import { useSelector } from "react-redux";
+import { Modal } from "react-bootstrap";
 import LegendSimColor from "./LegendSimColor.jsx";
 import Island from "@jetbrains/ring-ui/dist/island/island";
 import Header from "@jetbrains/ring-ui/dist/island/header";
 import Content from "@jetbrains/ring-ui/dist/island/content";
 import Button from "@jetbrains/ring-ui/dist/button/button";
-import experimentIcon from '@jetbrains/icons/experiment-20px';
+import experimentIcon from "@jetbrains/icons/experiment-20px";
 import Icon from "@jetbrains/ring-ui/dist/icon/icon";
-import {ControlsHeight, ControlsHeightContext} from "@jetbrains/ring-ui/dist/global/controls-height";
+import {
+  ControlsHeight,
+  ControlsHeightContext,
+} from "@jetbrains/ring-ui/dist/global/controls-height";
 import List from "@jetbrains/ring-ui/dist/list/list";
-import {Input, Size} from "@jetbrains/ring-ui/dist/input/input";
+import { Input, Size } from "@jetbrains/ring-ui/dist/input/input";
 import arrowUpIcon from "@jetbrains/icons/arrow-up";
 import archiveIcon from "@jetbrains/icons/archive";
 import ButtonSet from "@jetbrains/ring-ui/dist/button-set/button-set";
-import {Col, Grid, Row} from "@jetbrains/ring-ui/dist/grid/grid";
+import { Col, Grid, Row } from "@jetbrains/ring-ui/dist/grid/grid";
 
 function SimulationModeModal(props) {
-  const {t, i18n} = useTranslation();
+  const { t, i18n } = useTranslation();
   const formatPercentage = format(",.1%");
   const formatSI = format(".3s");
 
   const simulationVisualizationData = props.simulationData;
   const simulationVisualizationPath = props.simulationPath;
+  const sortingKey = props.sortingKey;
+  const sortingOrder = props.sortingOrder;
+  const tilingFunction = props.tilingFunction;
+  const zoom = props.zoom;
   const authorsList =
     "users" in simulationVisualizationData
       ? [...simulationVisualizationData.users]
@@ -125,11 +132,10 @@ function SimulationModeModal(props) {
   };
 
   return (
-
     <>
       <Island>
         <Header border>
-          Simulation Mode{" "}
+          Simulation{" "}
           <InfoPanel
             divName="simInfoPanel"
             header="How does the simulation mode work?"
@@ -154,14 +160,17 @@ function SimulationModeModal(props) {
             id="simulationModeCollapsible"
             className="collapse show">
             <p className="small">
-              Using this mode, we can highlight if the bus factor changes when one or more
-              authors leave
+              Using this mode, we can highlight if the bus factor changes when
+              one or more authors leave
             </p>
             <ControlsHeightContext.Provider value={ControlsHeight.L}>
-              <Button primary onClick={handleShow}><Icon glyph={experimentIcon}/> Use Simulation Mode</Button>
+              <Button
+                primary
+                onClick={handleShow}>
+                <Icon glyph={experimentIcon} /> Use Simulation Mode
+              </Button>
             </ControlsHeightContext.Provider>
           </div>
-
         </Content>
       </Island>
 
@@ -175,10 +184,13 @@ function SimulationModeModal(props) {
         </Modal.Header>
 
         <Modal.Body>
-
           <Grid>
             <Row>
-              <Col xs={9} sm={9} md={9} lg={9}>
+              <Col
+                xs={9}
+                sm={9}
+                md={9}
+                lg={9}>
                 <center>
                   <TreeMap
                     colorDefinitions={CONFIG.general.colors.jetbrains}
@@ -189,15 +201,22 @@ function SimulationModeModal(props) {
                     initialHeight={CONFIG.simulation.layout.height}
                     initialWidth={CONFIG.simulation.layout.width}
                     padding={CONFIG.simulation.layout.overallPadding}
+                    sortingKey={sortingKey}
+                    sortingOrder={sortingOrder}
                     svgId={CONFIG.simulation.ids.treemapSvgId}
-                    tilingFunction={tiling.squarify}
+                    tilingFunction={tilingFunction}
                     topPadding={CONFIG.simulation.layout.topPadding}
                     type="mini"
-                    reduxNavFunctions={props.reduxNavFunctions}></TreeMap>
+                    reduxNavFunctions={props.reduxNavFunctions}
+                    zoom={zoom}></TreeMap>
                 </center>
               </Col>
-              <Col xs={3} sm={3} md={3} lg={3}>
-                <div style={{marginBottom: 20}}>
+              <Col
+                xs={3}
+                sm={3}
+                md={3}
+                lg={3}>
+                <div style={{ marginBottom: 20 }}>
                   <nav aria-label="breadcrumb">
                     <strong>Path:</strong>
                     <ol className="breadcrumb">
@@ -206,14 +225,18 @@ function SimulationModeModal(props) {
                         .map((pathElement, i) => (
                           <li
                             className={
-                              i < simulationVisualizationPath.split("/").length - 1
+                              i <
+                              simulationVisualizationPath.split("/").length - 1
                                 ? "btn btn-link breadcrumb-item p-1"
                                 : "btn btn-link breadcrumb-item active p-1"
                             }
                             key={pathElement}
                             onClick={() =>
                               setTreemapPathOutFunc(
-                                generateBreadcrumb(i, simulationVisualizationPath)
+                                generateBreadcrumb(
+                                  i,
+                                  simulationVisualizationPath
+                                )
                               )
                             }>
                             {pathElement}
@@ -230,54 +253,55 @@ function SimulationModeModal(props) {
                             .split("/")
                             .filter((r) => r !== "").length > 1
                             ? setTreemapPathOutFunc(
-                              simulationVisualizationPath
-                                .split("/")
-                                .slice(0, -1)
-                                .join("/")
-                            )
-                            : setTreemapPathOutFunc(".")}
-                      ><Icon glyph={arrowUpIcon}/> Up</Button>
+                                simulationVisualizationPath
+                                  .split("/")
+                                  .slice(0, -1)
+                                  .join("/")
+                              )
+                            : setTreemapPathOutFunc(".")
+                        }>
+                        <Icon glyph={arrowUpIcon} /> Up
+                      </Button>
                       <Button
                         primary
                         onClick={() => returnTreeMapHome()}>
-                        <Icon glyph={archiveIcon}/> Home</Button>
+                        <Icon glyph={archiveIcon} /> Home
+                      </Button>
                     </ButtonSet>
                   </center>
                 </div>
 
-
                 {/*TODO: add same width for input and list*/}
                 <Input
                   onChange={handleSearchTextChange}
-                  size={Size.L}
-                ></Input>
+                  size={Size.L}></Input>
 
                 <List
                   maxHeight={600}
                   shortcuts={true}
                   onSelect={(item, e) => {
-                    handleAuthorCheckmark(item.label)
+                    handleAuthorCheckmark(item.label);
                   }}
                   data={
                     authorsList && authorsListContributionPercentage
                       ? authorsListContributionPercentage
-                        .filter((element) =>
-                          element["email"].includes(nameFilterValue)
-                        )
-                        .sort((a, b) => b.relativeScore - a.relativeScore)
-                        .map((authorScorePair, index) => (
-                          {
+                          .filter((element) =>
+                            element["email"].includes(nameFilterValue)
+                          )
+                          .sort((a, b) => b.relativeScore - a.relativeScore)
+                          .map((authorScorePair, index) => ({
                             label: authorScorePair.email,
-                            details: formatPercentage(authorScorePair.relativeScore),
+                            details: formatPercentage(
+                              authorScorePair.relativeScore
+                            ),
                             rgItemType: List.ListProps.Type.ITEM,
-                            checkbox: !removedAuthorsList.includes(authorScorePair.email)
-                          }
-                        ))
+                            checkbox: !removedAuthorsList.includes(
+                              authorScorePair.email
+                            ),
+                          }))
                       : []
                   }
                 />
-
-
               </Col>
             </Row>
           </Grid>

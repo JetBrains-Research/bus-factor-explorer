@@ -28,24 +28,10 @@ export const formatSI = d3.format(".2s");
 
 export const treemap = d3.treemap;
 
-export function normalizeD3DataValues(node) {
-  if (nodeWithChildren(node)) {
-    node.children.forEach((element) => {
-      normalizeD3DataValues(element);
-    });
-  }
-
-  if (node.value >= 0) {
-    node.size = node.value;
-    node.value = Math.sqrt(node.value);
-  }
-
-  return node;
-}
-
 export function applyNormalizationToD3Hierarchy(hierarchy, normFunction) {
   if (hierarchy) {
     hierarchy.eachAfter((d) => {
+      d.name = String(d.name);
       if (d.depth <= 1) {
         d.size = d.value;
 
@@ -86,6 +72,16 @@ export function applyRegExFilters(hierarchy, filters) {
   }
 }
 
+export function applyFolderFilter(hierarchy) {
+  if (hierarchy) {
+    hierarchy.eachAfter((d) => {
+      if (!d.hasOwnProperty("children")) {
+        d.value = 0;
+      }
+    });
+  }
+}
+
 export function applyExtensionFilters(hierarchy, filters) {
   if (hierarchy) {
     if (filters) {
@@ -94,7 +90,7 @@ export function applyExtensionFilters(hierarchy, filters) {
           if (d.value > 0) {
             const filePathSplit = d.data.name.split("/");
             const fileName = filePathSplit[filePathSplit.length - 1];
-            const fileExtension = getFileExtension(fileName)
+            const fileExtension = getFileExtension(fileName);
 
             if (fileExtension === filterExtension) {
               d.value = 0;
@@ -194,10 +190,10 @@ function rectangleOnMouseOverHandler(d) {
 
     const rects = d3.select(d.nodeUid.href);
     rects
-      .transition()
+      .transition(CONFIG.treemap.children.rect.transitionDuration)
       .duration(500)
       .ease(d3.easeExpOut)
-      .style("stroke-width", "0.3rem");
+      .style("stroke-width", "0.15rem");
   }
 }
 
@@ -294,17 +290,19 @@ node status: ${
         ? CONFIG.treemap.classes.rectWrapperChild
         : CONFIG.treemap.classes.rectWrapperParent
     )
-    .append("div");
+    .style("cursor", "pointer")
+    .append("div")
+    .attr("class", "p-1")
+    .style("display", "flex")
+    .style("min-width", "0px")
+    .style("align-items", "center")
+    .style("justify-content", "center");
 
   textBox
     .filter((d) => nodeWithChildren(d.data) && d.depth > 0)
     .on("click", (_e, d) =>
       rectangleOnClickHandlerMiniTreemap(d, reduxNavFunctions)
-    )
-    .append("xhtml:i")
-    .attr("class", CONFIG.treemap.classes.folderIcon)
-    .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.icon.miniFontSize);
+    );
 
   textBox
     .append("xhtml:p")
@@ -315,11 +313,13 @@ node status: ${
           : ""
       } ${d.data.name}`;
     })
-    .attr("class", "text-truncate")
-    .attr("id", (d) => `p-${d.nodeUid}`)
+    .attr("class", "text-truncate mb-0")
+    .attr("id", (d) => `p-${d.nodeUid.id}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.p.miniFontSize);
+    .style("font-size", CONFIG.treemap.children.p.miniFontSize)
+    .style("min-width", "0px")
+    .style("width", "100%");
 }
 
 export function drawTreemapFromGeneratedLayout(
@@ -334,6 +334,8 @@ export function drawTreemapFromGeneratedLayout(
 
   // Calculate color of background and text
   addColorsToTreemap(root, colorGenerator, unavailableBusFactorColor);
+
+  svg.style("cursor", "grab");
 
   // Start 'painting'
   const node = svg
@@ -414,29 +416,43 @@ bus factor: ${
     )
     .on("mouseover", (_e, d) => rectangleOnMouseOverHandler(d))
     .on("mouseout", (_e, d) => rectangleOnMouseOutHandler(d))
-    .append("div");
+    .style("cursor", "pointer")
+    .append("div")
+    .attr("class", "p-1")
+    .style("display", "flex")
+    .style("min-width", "0px")
+    .style("align-items", "center")
+    .style("justify-content", "center");
 
-  textBox
-    .filter((d) => nodeWithChildren(d.data) && d.depth > 0)
-    .append("xhtml:i")
-    .attr("class", CONFIG.treemap.classes.folderIcon)
-    .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.icon.fontSize);
+  // textBox.append().html(folder);
 
-  textBox
+  const p = textBox
     .append("xhtml:p")
-    .text((d) => {
-      if (d.data.busFactorStatus) {
-        if ("busFactor" in d.data.busFactorStatus)
-          return (
-            `[${d.data.busFactorStatus.busFactor}] ${d.data.name}`
-          );
-      }
-      return d.data.name;
-    })
-    .attr("class", "text-truncate")
+    .attr("class", "text-truncate mb-0")
     .attr("id", (d) => `p-${d.nodeUid.id}`)
     .style("overflow-wrap", "break-word")
     .style("color", (d) => d.textColor)
-    .style("font-size", CONFIG.treemap.children.p.fontSize);
+    .style("font-size", (d) => 0.9 + "em")
+    .style("min-width", "0px")
+    .style("width", "100%")
+    .text((d) => {
+      if (d.data.busFactorStatus) {
+        if ("busFactor" in d.data.busFactorStatus)
+          if (d.data.children) return ` ${d.data.name} `;
+        return ` ${d.data.name} `;
+      }
+      return d.data.name;
+    });
+
+  textBox
+    .filter((d) => d.data.children && d.data.children.length > 0 && d.depth > 0)
+    .select("p")
+    .append("xhtml:i")
+    .lower()
+    .attr("class", CONFIG.treemap.classes.folderIcon)
+    .style("color", (d) => d.textColor)
+    .style("font-size", CONFIG.treemap.children.icon.fontSize)
+    .style("min-width", "0px")
+    .style("width", "100%");
+
 }

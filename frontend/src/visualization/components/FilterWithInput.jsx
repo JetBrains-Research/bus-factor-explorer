@@ -5,6 +5,7 @@ import {useSelector} from "react-redux";
 import {CONFIG} from "../config";
 import {InfoPanel} from "./InfoPanel";
 import Button from "@jetbrains/ring-ui/dist/button/button";
+import { Input, Size } from "@jetbrains/ring-ui/dist/input/input";
 
 function FilterWithInput(props) {
   const dispatch = props.dispatch;
@@ -75,22 +76,22 @@ function FilterWithInput(props) {
 
       {props.summary ? <small>{props.summary}</small> : null}
 
-      <div className="input-group">
-        <input
+      <div className="input-group justify-content-center">
+        <Input
           type="text"
-          className="form-control"
           placeholder={filterPropertyType}
           aria-label={filterPropertyType}
           aria-describedby="input-file-extension"
-          onChange={handleTextChange}></input>
+          onChange={handleTextChange}
+          size={Size.S} />
 
-        <button
-          className="btn btn-dark"
+        <Button
           type="button"
           id="button-filter-add"
-          onClick={handleFilterElementSubmit}>
+          onClick={handleFilterElementSubmit}
+          primary>
           Add
-        </button>
+          </Button>
       </div>
 
       {/*TODO: replace with tags ringui*/}
