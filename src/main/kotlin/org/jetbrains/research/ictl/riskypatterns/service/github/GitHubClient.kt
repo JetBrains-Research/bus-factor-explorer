@@ -109,7 +109,9 @@ class GitHubClient(
             .filter { it.type == BOT_TYPE }
             .mapTo(mutableSetOf()) { it.login }
 
-    suspend fun loadContributors(owner: String, repo: String) =  httpClient.get(GetGitHubRepository.Contributors(GetGitHubRepository(), owner, repo))
+    suspend fun loadContributors(owner: String, repo: String) = httpClient.get(
+        GetGitHubRepository.Contributors(GetGitHubRepository(), owner, repo),
+    )
         .body<List<ContributorItem>>()
 }
 
