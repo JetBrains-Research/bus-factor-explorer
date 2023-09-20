@@ -1,7 +1,9 @@
 package org.jetbrains.research.ictl.riskypatterns.service.task
 
 import org.eclipse.jgit.internal.storage.file.FileRepository
+import org.jetbrains.research.ictl.riskypatterns.calculation.BotFilter
 import org.jetbrains.research.ictl.riskypatterns.calculation.BusFactor
+import org.jetbrains.research.ictl.riskypatterns.calculation.UserMerger
 import org.jetbrains.research.ictl.riskypatterns.jgit.CommitsProvider
 import org.jetbrains.research.ictl.riskypatterns.jgit.FileInfoProvider
 import org.jetbrains.research.ictl.riskypatterns.service.artifact.ArtifactService
@@ -66,13 +68,21 @@ class ComputeBusFactorJob(
             executionEnvironment.logFile.log(repositoryCloned)
 
             val bots = gitHubClient.loadBots(payload.owner, payload.repo)
+            val botFilter = BotFilter(bots)
             val started = System.currentTimeMillis()
-            val busFactor = BusFactor(bots)
+            val busFactor = BusFactor()
             val gitDir = File(executionEnvironment.gitDir, ".git")
             val repository = FileRepository(gitDir)
             val commitsProvider = CommitsProvider(repository)
             val fileInfoProvider = FileInfoProvider(repository)
-            val tree = busFactor.calculate(payload.fullName, commitsProvider, fileInfoProvider)
+            val merger = UserMerger(botFilter)
+            val mergedUsers = merger.mergeUsers(repository)
+            executionEnvironment.logFile.log("Number of merged users: ${mergedUsers.size}")
+            mergedUsers.forEach {
+                executionEnvironment.logFile.log(it.toString())
+            }
+            val tree =
+                busFactor.calculate(payload.fullName, commitsProvider, fileInfoProvider, botFilter = botFilter, mergedUsers = mergedUsers)
             val ended = System.currentTimeMillis()
 
             executionEnvironment.logFile.log("Finished task: [${payload.fullName}]")

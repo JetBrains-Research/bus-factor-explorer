@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.research.ictl:bf-core:0.0.3")
+    implementation("org.jetbrains.research.ictl:bf-core:0.0.5")
     implementation("io.ktor:ktor-server-metrics-micrometer")
     implementation("io.micrometer:micrometer-registry-prometheus:1.10.5")
 
