@@ -7,8 +7,12 @@ class GitHubSearchService(
     private val gitHubClient: GitHubClient,
 ) {
     suspend fun searchRepositories(q: String) =
-        gitHubClient.searchRepositories(q).groupBy { it.owner }
-            .map { RepositoriesByOwner(it.key, it.value) }
+        if (q.isNotBlank()) {
+            gitHubClient.searchRepositories("$q fork:true").groupBy { it.owner }
+                .map { RepositoriesByOwner(it.key, it.value) }
+        } else {
+            emptyList()
+        }
 }
 
 data class RepositoriesByOwner(
