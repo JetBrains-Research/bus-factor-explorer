@@ -1,7 +1,12 @@
 package org.jetbrains.research.ictl.riskypatterns.service.task
 
 import org.eclipse.jgit.internal.storage.file.FileRepository
+import org.eclipse.jgit.lib.Repository
+import org.jetbrains.research.ictl.riskypatterns.calculation.BotFilter
 import org.jetbrains.research.ictl.riskypatterns.calculation.BusFactor
+import org.jetbrains.research.ictl.riskypatterns.calculation.UserMerger
+import org.jetbrains.research.ictl.riskypatterns.calculation.entities.UserInfo
+import org.jetbrains.research.ictl.riskypatterns.calculation.processors.CommitProcessor
 import org.jetbrains.research.ictl.riskypatterns.jgit.CommitsProvider
 import org.jetbrains.research.ictl.riskypatterns.jgit.FileInfoProvider
 import org.jetbrains.research.ictl.riskypatterns.service.artifact.ArtifactService
@@ -65,14 +70,23 @@ class ComputeBusFactorJob(
             log.info(repositoryCloned)
             executionEnvironment.logFile.log(repositoryCloned)
 
-            val bots = gitHubClient.loadBots(payload.owner, payload.repo)
             val started = System.currentTimeMillis()
-            val busFactor = BusFactor(bots)
+
             val gitDir = File(executionEnvironment.gitDir, ".git")
             val repository = FileRepository(gitDir)
+
+            val bots = gitHubClient.loadBots(payload.owner, payload.repo)
+            val botFilter = BotFilter(bots)
+            val merger = UserMerger(botFilter)
+            val users = getUsers(repository)
+            val mergedUsers = merger.mergeUsers(users)
+
             val commitsProvider = CommitsProvider(repository)
             val fileInfoProvider = FileInfoProvider(repository)
-            val tree = busFactor.calculate(payload.fullName, commitsProvider, fileInfoProvider)
+            val busFactor = BusFactor(botFilter, mergedUsers)
+            busFactor.setLastCommit(commitsProvider.first())
+            busFactor.proceedCommits(commitsProvider)
+            val tree = busFactor.calculate(payload.fullName, fileInfoProvider)
             val ended = System.currentTimeMillis()
 
             executionEnvironment.logFile.log("Finished task: [${payload.fullName}]")
@@ -98,6 +112,19 @@ class ComputeBusFactorJob(
         } finally {
             executionEnvironment.rootDir.deleteRecursively()
         }
+    }
+
+    private fun getUsers(repository: Repository): Set<UserInfo> {
+        val commitsProvider = CommitsProvider(repository)
+        val set = mutableSetOf<UserInfo>()
+        for (commit in commitsProvider) {
+            set.add(commit.authorUserInfo)
+            set.add(commit.committerUserInfo)
+            CommitProcessor.getCoAuthorsFromMSG(commit.fullMessage).forEach {
+                set.add(it)
+            }
+        }
+        return set
     }
 
     private fun eventProducer(owner: String, repo: String): (EventLevel, String, JobState) -> JobExecutionEvent {
