@@ -3,6 +3,9 @@
 # `bus-factor-explorer`
 A web app for exploring Bus Factor of GitHub projects.
 
+> [!NOTE]
+> This repository contains a finished research prototype. While you are welcome to explore and fork the repository, please note that no further updates, bug fixes, or support will be provided.
+
 ## About
 Bus factor (BF) is a metric that tracks knowledge distribution in a project.
 It is the minimal number of engineers that have to leave for a project to stall.
