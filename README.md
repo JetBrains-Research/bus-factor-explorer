@@ -47,3 +47,19 @@ Build and start:
 
 Auto-format code:
 1. Run `./gradlew ktlintFormat`
+
+## Attribution
+
+If you found this work helpful, please consider citing the [Bus Factor Explorer paper](https://arxiv.org/abs/2403.08038) in your work:
+
+```bibtex
+@inproceedings{klimov2023BusFactorExplorer,
+   title     = {Bus Factor Explorer},
+   author    = {Egor Klimov and Muhammad Umair Ahmed and Nikolai Sviridov and Pouria Derakhshanfar and Eray Tüzün and Vladimir Kovalenko},
+   booktitle = {Proceedings of the 2023 38th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+   publisher = {IEEE},
+   year      = {2023},
+   url       = {https://arxiv.org/abs/2403.08038},
+   doi       = {10.1109/ase56229.2023.00015}
+}
+```
